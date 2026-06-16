@@ -4,6 +4,8 @@ This is a resume editor and tailoring tool that can transform a CV into several 
 
 > "Build once, tailor forever."
 
+Website: [endlessresume.netlify.app](https://endlessresume.netlify.app/)
+
 _A group project for WDD 430, Full Stack Web Development_
 
 ## Setup, Installation, Technology List

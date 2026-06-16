@@ -11,6 +11,8 @@ npm run dev
 npm run dev -- --open
 ```
 
+[Trello](https://trello.com/b/OhRBFcVH/endlessresume)
+
 ## Building
 
 To create a production version of your app:
