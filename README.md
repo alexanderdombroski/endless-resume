@@ -6,7 +6,7 @@ This is a resume editor and tailoring tool that can transform a CV into several 
 
 _A group project for WDD 430, Full Stack Web Development_
 
-## Setup and Installation
+## Setup, Installation, Technology List
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
