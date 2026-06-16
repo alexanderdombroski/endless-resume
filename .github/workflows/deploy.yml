@@ -24,6 +24,8 @@ jobs:
       - name: Build
         run: npm run build
       - name: Deploy
-        run: npx netlify deploy --prod --no-build --dir "./dist" --site "ee0d2da1-a242-4db8-bf08-8dc2ae7c9e3f"
+        run: |
+          npm i -g netlify-cli
+          netlify deploy --prod --no-build --dir "./build" --site "ee0d2da1-a242-4db8-bf08-8dc2ae7c9e3f"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
