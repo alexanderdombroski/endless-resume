@@ -1,5 +1,5 @@
 @layer base;
 
 @import "https://unpkg.com/@csstools/normalize.css" layer(base);
+@import "./base/reset.css" layer(base);
 @import "./base/typography.css" layer(base);
-@import "./base/global.css" layer(base);
