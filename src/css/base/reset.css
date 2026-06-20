@@ -1,0 +1,7 @@
+:where(a:visited) {
+  color: unset;
+}
+
+:where(*) {
+  box-sizing: border-box;
+}
