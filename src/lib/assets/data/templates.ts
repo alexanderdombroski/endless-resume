@@ -1,12 +1,23 @@
 import type { Resume } from "$lib/schemas";
 
-type ResumeTemplate = Omit<Resume, "_id" | "createdAt" | "updatedAt" | "font" | "spacing"> & {
+export type ResumeTemplate = Omit<
+  Resume,
+  "_id" | "createdAt" | "updatedAt" | "font" | "spacing"
+> & {
   template: string;
+  summary: string;
+  audience: string;
+  tags: string[];
 };
 
 export const templates: ResumeTemplate[] = [
   {
-    template: "traditional-professional",
+    template: "Traditional Professional",
+    summary:
+      "A classic chronological layout that prioritizes clean formatting, structural clarity, and readability. It places your core profile on top and walks through traditional history blocks.",
+    audience:
+      "Ideal for established professionals in corporate, legal, or traditional industries where standard, robust layouts are standard.",
+    tags: ["Classic", "Chronological", "Corporate", "Clean"],
     title: "Your Name",
     subtitle: [
       { label: "Email", value: "" },
@@ -81,7 +92,12 @@ export const templates: ResumeTemplate[] = [
     ]
   },
   {
-    template: "student-early-career",
+    template: "Student & Early Career",
+    summary:
+      "A layout crafted to highlight academic milestones, skills, and personal coding or design projects before professional experience. It moves education to the top page focal point.",
+    audience:
+      "Perfect for students, recent graduates, or career changers who want to emphasize hands-on projects and skill acquisition.",
+    tags: ["Academic", "Project-focused", "Modern", "Teal Accent"],
     title: "Your Name",
     subtitle: [
       { label: "Email", value: "" },
@@ -157,7 +173,12 @@ export const templates: ResumeTemplate[] = [
     ]
   },
   {
-    template: "experienced-professional",
+    template: "Experienced Professional",
+    summary:
+      "An executive-grade template featuring a comprehensive professional summary profile and structured listings for multi-stage career timelines, key certifications, and awards.",
+    audience:
+      "Best for senior engineers, managers, directors, or general executives with a deep history of accomplishments and credentials.",
+    tags: ["Executive", "High-density", "Multi-page-ready", "Indigo Accent"],
     title: "Your Name",
     subtitle: [
       { label: "Email", value: "" },
