@@ -23,10 +23,17 @@ export const ListEntry = z.object({
   items: z.array(z.string())
 });
 
+export const TextEntry = z.object({
+  type: z.literal("text"),
+  heading: z.string().optional(),
+  content: z.string()
+});
+
 export const SubSectionSchema = z.discriminatedUnion("type", [
   TimelineEntry,
   StructuredEntry,
-  ListEntry
+  ListEntry,
+  TextEntry
 ]);
 
 const SectionTypes = SubSectionSchema.options.map((schema) => schema.shape.type.value);
