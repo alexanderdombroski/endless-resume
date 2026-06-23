@@ -23,6 +23,14 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
+## Environment Setup
+
+The app requires the following variables in `.src`
+
+```zsh
+DATABASE_URL="mongodb+srv://**********************************"
+```
+
 ## Full Technology List
 
 ### Frontend
