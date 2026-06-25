@@ -24,15 +24,15 @@ All database schemas use [Zod](https://zod.dev/) and can be found in [lib/schema
   - save all content changes
   - reorder sections, subsections, bullet points
   - configure section & subsection spacing
-- Printing:
-  - use browser printing to save as PDF or print
-  - export to PDF button
 
 ### Advanced Features
 
-- Resume height indicator
+- Printing:
+  - use browser printing to save as PDF or print
+  - export to PDF button
+  - Resume height indicator
 - Autosave
-- PWA and/or Offline editing support
+- PWA and/or offline editing support
 - Editor undo/redo
 
 ### Optional, Bonus Stretch Features
