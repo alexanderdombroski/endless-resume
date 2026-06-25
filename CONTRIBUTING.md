@@ -12,6 +12,7 @@ npm run dev -- --open
 ```
 
 [Trello](https://trello.com/b/OhRBFcVH/endlessresume)
+[Feature & Technology Spec](./docs/spec.md)
 
 ## Building
 
