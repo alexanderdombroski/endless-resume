@@ -1744,11 +1744,11 @@
   .floating-toolbar {
     position: absolute;
     display: flex;
-    gap: 2px;
+    gap: 3px;
     background: #ffffff;
     border: 1.5px solid var(--color-border);
     border-radius: 6px;
-    padding: 2px;
+    padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     opacity: 0;
     pointer-events: none;
@@ -1760,7 +1760,7 @@
 
   /* Section block toolbars */
   .section-toolbar {
-    left: -42px;
+    left: -52px;
     top: 4px;
     flex-direction: column;
     transform: translateX(0);
@@ -1772,7 +1772,7 @@
     position: absolute;
     top: 0;
     left: 100%;
-    width: 48px;
+    width: 58px;
     height: 100%;
     min-height: 40px;
   }
@@ -1785,7 +1785,7 @@
 
   /* Entry block toolbars */
   .entry-toolbar {
-    right: -42px;
+    right: -52px;
     top: 4px;
     flex-direction: column;
     transform: translateX(0);
@@ -1797,7 +1797,7 @@
     position: absolute;
     top: 0;
     right: 100%;
-    width: 48px;
+    width: 58px;
     height: 100%;
     min-height: 40px;
   }
@@ -1811,14 +1811,16 @@
   .tool-btn {
     display: grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 28px;
+    margin-inline: auto;
+    white-space: nowrap;
     border: none;
     background: transparent;
     color: var(--color-text-muted);
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: bold;
     transition: all 0.12s;
   }
@@ -1831,6 +1833,12 @@
   .tool-btn.delete:hover {
     background: #fee2e2;
     color: #ef4444;
+  }
+
+  /* Add buttons fill the full toolbar width so text is always centered */
+  .tool-btn.add {
+    width: 100%;
+    padding: 0 4px;
   }
 
   .tool-btn.add:hover {
