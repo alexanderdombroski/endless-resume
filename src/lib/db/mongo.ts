@@ -1,14 +1,13 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient } from "mongodb";
 import {
   DATABASE_URL,
   DATABASE_USERNAME,
   DATABASE_PASSWORD,
   DATABASE_NAME,
   DATABASE_CLUSTER
-} from '$env/static/private';
+} from "$env/static/private";
 
 declare global {
-  // eslint-disable-next-line no-var
   var __mongoClientPromise: Promise<MongoClient> | undefined;
 }
 

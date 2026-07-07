@@ -1,14 +1,16 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
+// src/app.d.ts
+import type { auth } from "$lib/auth/auth";
+
+type Session = typeof auth.$Infer.Session.session;
+type User = typeof auth.$Infer.Session.user;
+
 declare global {
-	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
-		var __mongoClientPromise: Promise<import('mongodb').MongoClient> | undefined;
-	}
+  namespace App {
+    interface Locals {
+      session: Session | null;
+      user: User | null;
+    }
+  }
 }
 
 export {};

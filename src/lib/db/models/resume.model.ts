@@ -1,14 +1,11 @@
 // src/lib/db/models/resume.model.ts
-import { ObjectId, type Collection, type Document } from 'mongodb';
-import { getDb } from '$lib/db/mongo';
-import {
-  ResumeSchema,
-  type Resume
-} from '$src/lib/schemas';
+import { ObjectId, type Collection, type Document } from "mongodb";
+import { getDb } from "$lib/db/mongo";
+import { ResumeSchema, type Resume } from "$lib/schemas";
 
-const COLLECTION_NAME = 'resumes';
+const COLLECTION_NAME = "resumes";
 
-export type ResumeDocument = Omit<Resume, '_id'> & {
+export type ResumeDocument = Omit<Resume, "_id"> & {
   _id: ObjectId;
   userId?: ObjectId;
 };
@@ -23,7 +20,7 @@ function serializeResume(doc: ResumeDocument): Resume {
 
 function toObjectId(id: string): ObjectId {
   if (!ObjectId.isValid(id)) {
-    throw new Error('Invalid ObjectId');
+    throw new Error("Invalid ObjectId");
   }
 
   return new ObjectId(id);
@@ -55,10 +52,7 @@ export async function findResumeById(id: string): Promise<Resume | null> {
   return doc ? serializeResume(doc) : null;
 }
 
-export async function findResumeByIdAndUserId(
-  id: string,
-  userId: string
-): Promise<Resume | null> {
+export async function findResumeByIdAndUserId(id: string, userId: string): Promise<Resume | null> {
   const collection = await getResumeCollection();
 
   const doc = await collection.findOne({
@@ -70,7 +64,7 @@ export async function findResumeByIdAndUserId(
 }
 
 export async function createResume(
-  data: Omit<Resume, '_id' | 'createdAt' | 'updatedAt'>,
+  data: Omit<Resume, "_id" | "createdAt" | "updatedAt">,
   userId?: string
 ): Promise<Resume> {
   const collection = await getResumeCollection();
@@ -92,7 +86,7 @@ export async function createResume(
 
 export async function updateResumeById(
   id: string,
-  data: Partial<Omit<Resume, '_id' | 'createdAt' | 'updatedAt'>>
+  data: Partial<Omit<Resume, "_id" | "createdAt" | "updatedAt">>
 ): Promise<Resume | null> {
   const collection = await getResumeCollection();
 
@@ -105,7 +99,7 @@ export async function updateResumeById(
       }
     },
     {
-      returnDocument: 'after'
+      returnDocument: "after"
     }
   );
 
@@ -115,7 +109,7 @@ export async function updateResumeById(
 export async function updateResumeByIdAndUserId(
   id: string,
   userId: string,
-  data: Partial<Omit<Resume, '_id' | 'createdAt' | 'updatedAt'>>
+  data: Partial<Omit<Resume, "_id" | "createdAt" | "updatedAt">>
 ): Promise<Resume | null> {
   const collection = await getResumeCollection();
 
@@ -131,7 +125,7 @@ export async function updateResumeByIdAndUserId(
       }
     },
     {
-      returnDocument: 'after'
+      returnDocument: "after"
     }
   );
 
@@ -148,10 +142,7 @@ export async function deleteResumeById(id: string): Promise<boolean> {
   return result.deletedCount === 1;
 }
 
-export async function deleteResumeByIdAndUserId(
-  id: string,
-  userId: string
-): Promise<boolean> {
+export async function deleteResumeByIdAndUserId(id: string, userId: string): Promise<boolean> {
   const collection = await getResumeCollection();
 
   const result = await collection.deleteOne({
