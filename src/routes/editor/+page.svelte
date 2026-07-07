@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
+  import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import EditorForm from "$lib/components/editor/EditorForm.svelte";
   import type { Resume } from "$lib/schemas";
@@ -123,24 +123,7 @@
   <meta name="description" content="Edit and tailor your resume with the Endless Resume editor." />
 </svelte:head>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href={resolve("/")} aria-label="Endless Resume home">
-      <span class="brand-mark" aria-hidden="true">ER</span>
-      <div class="brand-copy">
-        <p class="brand-name">Endless Resume</p>
-        <p class="brand-tagline">Resume Editor</p>
-      </div>
-    </a>
-
-    <nav class="site-nav" aria-label="Primary">
-      <a class="nav-link" href={resolve("/")}>Home</a>
-      <a class="nav-link" href={resolve("/dashboard")}>Dashboard</a>
-      <a class="nav-link active" href={resolve("/editor")}>Editor</a>
-      <a class="nav-link nav-cta" href={resolve("/sign-in")}>Sign in / Register</a>
-    </nav>
-  </div>
-</header>
+<Header />
 
 <main class="editor-main">
   <div class="editor-shell">
