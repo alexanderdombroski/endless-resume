@@ -1,3 +1,9 @@
+// TEMPORARY mock database (see docs/adr/adr-003.md for the real MongoDB plan).
+// resumesByUser is just an in-memory Map, seeded with fake resumes below, so
+// nothing survives a server restart. When Mongo is wired in: swap the Map for
+// real queries and delete seed() — keep the exported function names/signatures
+// the same so the /api/resumes routes don't need to change.
+
 import { randomUUID } from "node:crypto";
 import type { Resume } from "$lib/schemas";
 import type { ResumeTemplate } from "$lib/assets/data/templates";
