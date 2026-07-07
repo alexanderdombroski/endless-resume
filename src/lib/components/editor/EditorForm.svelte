@@ -1352,7 +1352,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     opacity: 0;
     pointer-events: none;
-    /* Delay the hide transition so crossing the gap doesn't dismiss it */
+    /* Delay hide so crossing the gap doesn't dismiss the popover */
     transition:
       opacity 0.15s ease 0.18s,
       transform 0.15s ease 0.18s;
@@ -1621,11 +1621,22 @@
     gap: 1px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.15s;
+    transition: opacity 0.12s ease 0s;
     z-index: 10;
   }
 
-  .bullet-item:hover .bullet-controls {
+  /* Invisible bridge: extends hover zone rightward to reach the bullet-item */
+  .bullet-controls::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 60px;
+    height: 100%;
+  }
+
+  .bullet-item:hover .bullet-controls,
+  .bullet-controls:hover {
     opacity: 1;
     pointer-events: auto;
   }
@@ -1733,59 +1744,83 @@
   .floating-toolbar {
     position: absolute;
     display: flex;
-    gap: 2px;
+    gap: 3px;
     background: #ffffff;
     border: 1.5px solid var(--color-border);
     border-radius: 6px;
-    padding: 2px;
+    padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     opacity: 0;
     pointer-events: none;
     transition:
-      opacity 0.2s,
-      transform 0.2s;
+      opacity 0.12s ease 0s,
+      transform 0.12s ease 0s;
     z-index: 50;
   }
 
   /* Section block toolbars */
   .section-toolbar {
-    left: -42px;
+    left: -52px;
     top: 4px;
     flex-direction: column;
-    transform: translateX(4px);
+    transform: translateX(0);
   }
 
-  .section-block:hover .section-toolbar {
+  /* Invisible bridge: extends hover zone rightward to reach the section-block */
+  .section-toolbar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 58px;
+    height: 100%;
+    min-height: 40px;
+  }
+
+  .section-block:hover .section-toolbar,
+  .section-toolbar:hover {
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(0);
   }
 
   /* Entry block toolbars */
   .entry-toolbar {
-    right: -42px;
+    right: -52px;
     top: 4px;
     flex-direction: column;
-    transform: translateX(-4px);
+    transform: translateX(0);
   }
 
-  .entry-block:hover .entry-toolbar {
+  /* Invisible bridge: extends hover zone leftward to reach the entry-block */
+  .entry-toolbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 100%;
+    width: 58px;
+    height: 100%;
+    min-height: 40px;
+  }
+
+  .entry-block:hover .entry-toolbar,
+  .entry-toolbar:hover {
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(0);
   }
 
   .tool-btn {
     display: grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 28px;
+    margin-inline: auto;
+    white-space: nowrap;
     border: none;
     background: transparent;
     color: var(--color-text-muted);
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: bold;
     transition: all 0.12s;
   }
@@ -1798,6 +1833,12 @@
   .tool-btn.delete:hover {
     background: #fee2e2;
     color: #ef4444;
+  }
+
+  /* Add buttons fill the full toolbar width so text is always centered */
+  .tool-btn.add {
+    width: 100%;
+    padding: 0 4px;
   }
 
   .tool-btn.add:hover {
