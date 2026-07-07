@@ -8,7 +8,7 @@
 
   let { data }: PageProps = $props();
 
-  let resumes = $state<Resume[]>(data.resumes);
+  let resumes = $derived<Resume[]>(data.resumes);
   let errorMessage = $state<string | null>(null);
 
   let isEmpty = $derived(resumes.length === 0);
