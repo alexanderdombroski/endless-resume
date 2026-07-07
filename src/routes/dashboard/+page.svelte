@@ -67,10 +67,12 @@
         <a class="btn btn-primary" href={resolve("/dashboard/new")}>Create your first resume</a>
       </div>
     {:else}
-      <div class="dashboard-grid">
-        {#each resumes as resume (resume._id)}
-          <ResumeCard {resume} ondelete={handleDelete} />
-        {/each}
+      <div class="dashboard-scroll">
+        <div class="dashboard-grid">
+          {#each resumes as resume (resume._id)}
+            <ResumeCard {resume} ondelete={handleDelete} />
+          {/each}
+        </div>
       </div>
     {/if}
   </div>
@@ -134,13 +136,43 @@
     color: var(--color-text-muted);
   }
 
+  /* Desktop: single row, scrolls side to side */
+  .dashboard-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0.25rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
   .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    display: flex;
     gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .dashboard-grid :global(.resume-card) {
+    flex: 0 0 240px;
   }
 
   @media (max-width: 600px) {
+    /* Mobile: stack into a column, scroll up and down instead */
+    .dashboard-scroll {
+      overflow-x: hidden;
+      overflow-y: auto;
+      max-height: 60vh;
+    }
+
+    .dashboard-grid {
+      flex-direction: column;
+    }
+
+    .dashboard-grid :global(.resume-card) {
+      flex: none;
+      width: 100%;
+    }
+
     .dashboard-shell {
       padding: 2rem 1.25rem;
     }

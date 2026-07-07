@@ -34,13 +34,24 @@ function templateToResume(template: ResumeTemplate, title?: string): Resume {
   };
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 function seed(userId: string) {
   const store = getUserStore(userId);
-  const seeded = [
-    templateToResume(templates[0], "Alex Morgan"),
-    templateToResume(templates[1], "Jordan Rivera")
+  const seedData: Array<[ResumeTemplate, string, number]> = [
+    [templates[0], "Alex Morgan", 1],
+    [templates[1], "Jordan Rivera", 3],
+    [templates[2], "Sam Chen", 5],
+    [templates[0], "Taylor Brooks", 8],
+    [templates[1], "Morgan Lee", 12],
+    [templates[2], "Casey Kim", 20]
   ];
-  for (const resume of seeded) {
+
+  for (const [template, title, daysAgo] of seedData) {
+    const resume = templateToResume(template, title);
+    const updatedAt = new Date(Date.now() - daysAgo * DAY_MS).toISOString();
+    resume.createdAt = updatedAt;
+    resume.updatedAt = updatedAt;
     store.set(resume._id, resume);
   }
 }
