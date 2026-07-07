@@ -1,6 +1,121 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import Footer from "$lib/components/Footer.svelte";
+  import EditorForm from "$lib/components/editor/EditorForm.svelte";
+  import type { Resume } from "$lib/schemas";
+
+  // Initialize starter resume with default values matching the type schema
+  let resume = $state<Resume>({
+    _id: "starter-resume-id",
+    title: "Software Engineer Resume",
+    subtitle: [
+      { label: "Email", value: "alex.dombroski@example.com" },
+      { label: "Phone", value: "(415) 555-2671" },
+      { label: "LinkedIn", value: "linkedin.com/in/alexdombroski" }
+    ],
+    sections: [
+      {
+        type: "text",
+        title: "Professional Summary",
+        entries: [
+          {
+            type: "text",
+            heading: "",
+            content:
+              "Results-driven Software Engineer with 4+ years of experience specializing in building responsive, state-of-the-art web applications. Proven track record in optimizing web performance and deploying scalable frontend architectures."
+          }
+        ]
+      },
+      {
+        type: "timeline",
+        title: "Work Experience",
+        entries: [
+          {
+            type: "timeline",
+            heading: "Senior Software Engineer",
+            subheading: "Tech Innovations Inc.",
+            location: "San Francisco, CA",
+            startDate: "2022-03",
+            endDate: "Present",
+            bullets: [
+              "Led the migration of a legacy monolithic frontend to SvelteKit, increasing page load speed by 45%.",
+              "Implemented an automated CI/CD pipeline reducing release cycle times by 30%.",
+              "Collaborated with product designers to build a reusable component library following accessibility guidelines."
+            ]
+          }
+        ]
+      },
+      {
+        type: "timeline",
+        title: "Education",
+        entries: [
+          {
+            type: "timeline",
+            heading: "B.S. in Computer Science",
+            subheading: "Stanford University",
+            location: "Stanford, CA",
+            startDate: "2018-09",
+            endDate: "2022-06",
+            bullets: []
+          }
+        ]
+      },
+      {
+        type: "structured",
+        title: "Projects",
+        entries: [
+          {
+            type: "structured",
+            heading: "Tailored Resume Builder",
+            startDate: "2023-05",
+            endDate: "2023-11",
+            bullets: [
+              "Architected a responsive single-page editor in Svelte 5 for editing multi-section documents.",
+              "Designed schemas utilizing Zod to validate document state and font styles on the client-side."
+            ]
+          }
+        ]
+      },
+      {
+        type: "list",
+        title: "Skills",
+        entries: [
+          {
+            type: "list",
+            heading: "",
+            items: [
+              "TypeScript",
+              "JavaScript",
+              "Svelte",
+              "SvelteKit",
+              "CSS/HTML",
+              "Node.js",
+              "REST APIs",
+              "Git"
+            ]
+          }
+        ]
+      }
+    ],
+    spacing: {
+      bullet: 4,
+      section: 16
+    },
+    font: {
+      family: "Inter",
+      sizes: {
+        title: 24,
+        heading: 14,
+        bullet: 10
+      }
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+
+  // Track the active section index.
+  // 0 corresponds to Basics. Section index 0, 1, 2... corresponds to resume.sections indexes.
+  let activeSectionIndex = $state<number | null>(0);
 </script>
 
 <svelte:head>
@@ -35,53 +150,44 @@
         <p class="sidebar-label">Sections</p>
       </div>
       <nav class="sidebar-nav" aria-label="Resume section navigation">
-        {#each ["Contact", "Summary", "Experience", "Education", "Skills", "Projects", "Certifications"] as section (section)}
-          <button class="sidebar-item" disabled>
+        <!-- Basics section toggle -->
+        <button
+          class="sidebar-item"
+          class:active={activeSectionIndex === 0 ||
+            activeSectionIndex === -1 ||
+            activeSectionIndex === null}
+          onclick={() => (activeSectionIndex = 0)}
+        >
+          <span class="sidebar-item-dot" aria-hidden="true"></span>
+          Basics & Contact
+        </button>
+
+        <!-- Dynamic sections toggle -->
+        {#each resume.sections as section, index (index)}
+          <button
+            class="sidebar-item"
+            class:active={activeSectionIndex === index + 1}
+            onclick={() => (activeSectionIndex = index + 1)}
+          >
             <span class="sidebar-item-dot" aria-hidden="true"></span>
-            {section}
+            {section.title || `Section ${index + 1}`}
           </button>
         {/each}
       </nav>
 
       <div class="sidebar-footer">
-        <div class="sidebar-coming-soon">
-          <span class="coming-soon-badge">Coming soon</span>
-          <p>Section navigation will appear here once the editor is live.</p>
+        <div class="sidebar-helper-card">
+          <span class="card-badge">Tips</span>
+          <p>
+            Click sections in this sidebar to quickly jump directly to their fields in the form.
+          </p>
         </div>
       </div>
     </aside>
 
-    <!-- Main editor canvas -->
+    <!-- Main editor canvas (renders the EditorForm component directly) -->
     <section class="editor-canvas" aria-labelledby="editor-title">
-      <div class="canvas-body">
-        <div class="editor-placeholder" aria-labelledby="editor-title">
-          <div class="placeholder-icon" aria-hidden="true">
-            <svg
-              width="40"
-              height="40"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
-              <polyline points="10 9 9 9 8 9" />
-            </svg>
-          </div>
-          <h1 id="editor-title">Resume Editor</h1>
-          <p>
-            The full editor is on its way. Soon you'll be able to write and refine your master
-            resume, surface the right sections for any role, and export a tailored version in
-            seconds.
-          </p>
-          <a class="btn btn-primary" href={resolve("/dashboard")}>Back to Dashboard</a>
-        </div>
-      </div>
+      <EditorForm bind:resume bind:activeSectionIndex />
     </section>
 
     <!-- Right panel: job description / AI suggestions -->
@@ -178,10 +284,24 @@
     background: transparent;
     border: none;
     border-radius: 6px;
-    cursor: not-allowed;
+    cursor: pointer;
     text-align: left;
-    opacity: 0.6;
+    transition: all 0.15s ease;
     font-family: inherit;
+    opacity: 0.8;
+  }
+
+  .sidebar-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--color-text);
+    opacity: 1;
+  }
+
+  .sidebar-item.active {
+    background: var(--color-accent-light);
+    color: var(--color-accent-dark);
+    font-weight: 600;
+    opacity: 1;
   }
 
   .sidebar-item-dot {
@@ -190,6 +310,11 @@
     border-radius: 50%;
     background: var(--color-border);
     flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .sidebar-item.active .sidebar-item-dot {
+    background: var(--color-accent);
   }
 
   .sidebar-footer {
@@ -197,7 +322,7 @@
     padding: 1rem 1.25rem 0;
   }
 
-  .sidebar-coming-soon {
+  .sidebar-helper-card {
     background: #fff;
     border: 1px solid var(--color-border);
     border-radius: 8px;
@@ -205,9 +330,10 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   }
 
-  .coming-soon-badge {
+  .card-badge {
     display: inline-block;
     font-size: 0.65rem;
     font-weight: 700;
@@ -221,7 +347,7 @@
     align-self: flex-start;
   }
 
-  .sidebar-coming-soon p {
+  .sidebar-helper-card p {
     font-size: 0.75rem;
     color: var(--color-text-muted);
     line-height: 1.5;
@@ -232,48 +358,7 @@
   .editor-canvas {
     display: flex;
     flex-direction: column;
-  }
-
-  .canvas-body {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-  }
-
-  .editor-placeholder {
-    max-width: 420px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-  }
-
-  .placeholder-icon {
-    width: 72px;
-    height: 72px;
-    display: grid;
-    place-items: center;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 16px;
-    color: var(--color-accent);
-  }
-
-  .editor-placeholder h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin: 0;
-  }
-
-  .editor-placeholder p {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-    line-height: 1.7;
-    margin: 0;
+    background: #f1f5f9;
   }
 
   /* === Right panel === */
