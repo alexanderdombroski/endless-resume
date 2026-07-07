@@ -1352,7 +1352,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     opacity: 0;
     pointer-events: none;
-    /* Delay the hide transition so crossing the gap doesn't dismiss it */
+    /* Delay hide so crossing the gap doesn't dismiss the popover */
     transition:
       opacity 0.15s ease 0.18s,
       transform 0.15s ease 0.18s;
@@ -1621,11 +1621,22 @@
     gap: 1px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.15s;
+    transition: opacity 0.12s ease 0s;
     z-index: 10;
   }
 
-  .bullet-item:hover .bullet-controls {
+  /* Invisible bridge: extends hover zone rightward to reach the bullet-item */
+  .bullet-controls::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 60px;
+    height: 100%;
+  }
+
+  .bullet-item:hover .bullet-controls,
+  .bullet-controls:hover {
     opacity: 1;
     pointer-events: auto;
   }
@@ -1742,8 +1753,8 @@
     opacity: 0;
     pointer-events: none;
     transition:
-      opacity 0.2s,
-      transform 0.2s;
+      opacity 0.12s ease 0s,
+      transform 0.12s ease 0s;
     z-index: 50;
   }
 
@@ -1752,13 +1763,24 @@
     left: -42px;
     top: 4px;
     flex-direction: column;
-    transform: translateX(4px);
+    transform: translateX(0);
   }
 
-  .section-block:hover .section-toolbar {
+  /* Invisible bridge: extends hover zone rightward to reach the section-block */
+  .section-toolbar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 48px;
+    height: 100%;
+    min-height: 40px;
+  }
+
+  .section-block:hover .section-toolbar,
+  .section-toolbar:hover {
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(0);
   }
 
   /* Entry block toolbars */
@@ -1766,13 +1788,24 @@
     right: -42px;
     top: 4px;
     flex-direction: column;
-    transform: translateX(-4px);
+    transform: translateX(0);
   }
 
-  .entry-block:hover .entry-toolbar {
+  /* Invisible bridge: extends hover zone leftward to reach the entry-block */
+  .entry-toolbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 100%;
+    width: 48px;
+    height: 100%;
+    min-height: 40px;
+  }
+
+  .entry-block:hover .entry-toolbar,
+  .entry-toolbar:hover {
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(0);
   }
 
   .tool-btn {
