@@ -20,6 +20,8 @@
     "test:e2e": "playwright install && playwright test"
   },
   "dependencies": {
+    "better-auth": "^1.6.23",
+    "mongodb": "^7.4.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
