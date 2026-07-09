@@ -2,6 +2,7 @@
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import EditorForm from "$lib/components/editor/EditorForm.svelte";
+  import EditorSuggestions from "$lib/components/editor/EditorSuggestions.svelte";
   import type { Resume } from "$lib/schemas";
 
   // Initialize starter resume with default values matching the type schema
@@ -116,6 +117,9 @@
   // Track the active section index.
   // 0 corresponds to Basics. Section index 0, 1, 2... corresponds to resume.sections indexes.
   let activeSectionIndex = $state<number | null>(0);
+
+  // Track if any field in EditorForm is focused / actively edited
+  let isEditing = $state(false);
 </script>
 
 <svelte:head>
@@ -170,7 +174,7 @@
 
     <!-- Main editor canvas (renders the EditorForm component directly) -->
     <section class="editor-canvas" aria-labelledby="editor-title">
-      <EditorForm bind:resume bind:activeSectionIndex />
+      <EditorForm bind:resume bind:activeSectionIndex bind:isEditing />
     </section>
 
     <!-- Right panel: job description / AI suggestions -->
@@ -191,14 +195,7 @@
         <button class="btn btn-primary panel-btn" disabled>Analyze job posting</button>
 
         <div class="panel-suggestions" aria-label="AI suggestions">
-          <p class="panel-suggestions-label">Suggestions</p>
-          {#each [1, 2, 3] as i (i)}
-            <div class="suggestion-skeleton" aria-hidden="true">
-              <div class="sk-line sk-line-long"></div>
-              <div class="sk-line sk-line-med"></div>
-            </div>
-          {/each}
-          <p class="panel-hint">Suggestions will appear after you analyze a job posting.</p>
+          <EditorSuggestions bind:resume {isEditing} />
         </div>
       </div>
     </aside>
@@ -238,8 +235,7 @@
     padding: 0 1.25rem 0.5rem;
   }
 
-  .sidebar-label,
-  .panel-suggestions-label {
+  .sidebar-label {
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -405,37 +401,6 @@
     gap: 0.75rem;
     padding-top: 0.5rem;
     border-top: 1px solid var(--color-border);
-  }
-
-  .suggestion-skeleton {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    padding: 0.75rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-  }
-
-  .sk-line {
-    height: 8px;
-    background: var(--color-border);
-    border-radius: 4px;
-  }
-
-  .sk-line-long {
-    width: 80%;
-  }
-  .sk-line-med {
-    width: 55%;
-  }
-
-  .panel-hint {
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-    line-height: 1.5;
-    margin: 0;
-    font-style: italic;
   }
 
   /* === Responsive === */

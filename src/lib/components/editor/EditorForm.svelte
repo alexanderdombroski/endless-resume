@@ -4,10 +4,12 @@
   // Bindable props using Svelte 5 runes
   let {
     resume = $bindable(),
-    activeSectionIndex = $bindable(0)
+    activeSectionIndex = $bindable(0),
+    isEditing = $bindable(false)
   }: {
     resume: Resume;
     activeSectionIndex?: number | null;
+    isEditing?: boolean;
   } = $props();
 
   // Component UI State
@@ -246,9 +248,32 @@
       }
     }
   });
+
+  let focusTimeout: ReturnType<typeof setTimeout> | undefined;
+  let editorFormContainer: HTMLDivElement | null = $state(null);
+
+  function handleFocusIn() {
+    clearTimeout(focusTimeout);
+    isEditing = true;
+  }
+
+  function handleFocusOut() {
+    clearTimeout(focusTimeout);
+    focusTimeout = setTimeout(() => {
+      if (!editorFormContainer?.contains(document.activeElement)) {
+        isEditing = false;
+      }
+    }, 100);
+  }
 </script>
 
-<div class="editor-form-container">
+<div
+  bind:this={editorFormContainer}
+  class="editor-form-container"
+  class:editing={isEditing}
+  onfocusin={handleFocusIn}
+  onfocusout={handleFocusOut}
+>
   <!-- Editor Form Header -->
   <header class="form-header">
     <div class="title-field">
