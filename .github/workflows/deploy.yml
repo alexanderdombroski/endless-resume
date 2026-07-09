@@ -29,3 +29,6 @@ jobs:
           netlify deploy --prod --no-build --dir "./build" --site "ee0d2da1-a242-4db8-bf08-8dc2ae7c9e3f"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
