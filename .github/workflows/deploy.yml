@@ -23,12 +23,7 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Deploy
-        run: |
-          npm i -g netlify-cli
-          netlify deploy --prod --no-build --dir "./build" --site "ee0d2da1-a242-4db8-bf08-8dc2ae7c9e3f"
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
           DATABASE_CLUSTER: ${{ secrets.DATABASE_CLUSTER }}
@@ -36,3 +31,9 @@ jobs:
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      - name: Deploy
+        run: |
+          npm i -g netlify-cli
+          netlify deploy --prod --no-build --dir "./build" --site "ee0d2da1-a242-4db8-bf08-8dc2ae7c9e3f"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
