@@ -6,7 +6,7 @@ import {
   removeEndingPeriod,
   addStartingPeriod,
   removeStartingPeriod
-} from "./string";
+} from "../../../lib/utils/string";
 
 describe("String Punctuation Utilities", () => {
   describe("hasEndingPeriod", () => {

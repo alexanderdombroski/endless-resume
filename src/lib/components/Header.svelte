@@ -1,10 +1,17 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { authClient } from "$lib/auth/auth-client";
+  import LoginDialog from "./LoginDialog.svelte";
+  import ProfilePopover from "./ProfilePopover.svelte";
 
   function isActive(path: string) {
     return page.url.pathname === path || page.url.pathname.startsWith(`${path}/`);
   }
+
+  const session = authClient.useSession();
+
+  let loginOpen = $state(false);
 </script>
 
 <header class="site-header">
@@ -27,7 +34,22 @@
       <a class="nav-link" class:active={isActive(resolve("/editor"))} href={resolve("/editor")}
         >Editor</a
       >
-      <a class="nav-link nav-cta" href={resolve("/sign-in")}>Sign in / Register</a>
+
+      {#if $session.data?.user}
+        <ProfilePopover />
+      {:else}
+        <button
+          class="nav-link nav-cta"
+          onclick={() => (loginOpen = true)}
+          type="button"
+          aria-haspopup="dialog"
+          id="header-sign-in-btn"
+        >
+          Sign in / Register
+        </button>
+      {/if}
     </nav>
   </div>
 </header>
+
+<LoginDialog bind:open={loginOpen} />
