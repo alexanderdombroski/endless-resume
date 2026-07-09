@@ -17,5 +17,9 @@ export const auth = betterAuth({
   },
 
   plugins: [sveltekitCookies(getRequestEvent)],
-  trustedOrigins: ["https://endlessresume.netlify.app/", "http://localhost:4173"]
+  trustedOrigins: [
+    "https://endlessresume.netlify.app/",
+    "http://localhost:4173",
+    "http://localhost:5173"
+  ]
 });
