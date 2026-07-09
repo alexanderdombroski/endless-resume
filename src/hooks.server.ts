@@ -19,3 +19,7 @@ export async function handle({ event, resolve }) {
     building
   });
 }
+
+export function handleError({ error }) {
+  console.error("HOOKS ERROR:", error);
+}
