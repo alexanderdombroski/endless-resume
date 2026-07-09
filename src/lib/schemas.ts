@@ -46,6 +46,7 @@ export const SectionSchema = z.object({
 
 export const ResumeSchema = z.object({
   _id: z.string(),
+  user_id: z.string(), //This should reference _id in users. (The user who created this resume)
   title: z.string(),
   subtitle: z.array(
     z.object({
