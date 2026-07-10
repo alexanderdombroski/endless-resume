@@ -11,6 +11,7 @@
 
   let resume = $state<Resume | null>(null);
   let loadError = $state<string | null>(null);
+  let saveError = $state<string | null>(null);
   let isLoading = $state(true);
 
   // Track the active section index.
@@ -19,6 +20,34 @@
 
   // Track if any field in EditorForm is focused / actively edited
   let isEditing = $state(false);
+
+  async function saveResume() {
+    if (!resume) {
+      throw new Error("No resume loaded");
+    }
+
+    saveError = null;
+
+    const res = await fetch(`/api/resumes/${resume._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: resume.title,
+        subtitle: resume.subtitle,
+        sections: resume.sections,
+        spacing: resume.spacing,
+        font: resume.font
+      })
+    });
+
+    if (!res.ok) {
+      saveError = "Failed to save resume. Please try again.";
+      throw new Error(`Resume save failed with status ${res.status}`);
+    }
+
+    const { updatedAt } = (await res.json()) as { updatedAt: string };
+    resume.updatedAt = updatedAt;
+  }
 
   async function loadResume(resumeId: string) {
     isLoading = true;
@@ -68,6 +97,10 @@
       <p class="editor-error" role="alert">{loadError}</p>
     {/if}
 
+    {#if saveError}
+      <p class="editor-error" role="alert">{saveError}</p>
+    {/if}
+
     {#if isLoading || !resume}
       <EditorSkeleton />
     {:else}
@@ -114,7 +147,7 @@
 
       <!-- Main editor canvas (renders the EditorForm component directly) -->
       <section class="editor-canvas" aria-labelledby="editor-title">
-        <EditorForm bind:resume bind:activeSectionIndex bind:isEditing />
+        <EditorForm bind:resume bind:activeSectionIndex bind:isEditing onSave={saveResume} />
       </section>
 
       <!-- Right panel: job description / AI suggestions -->
