@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import type { Resume } from "$lib/schemas";
   import ResumePreview from "./ResumePreview.svelte";
@@ -12,6 +13,15 @@
   } = $props();
 
   let isDeleting = $state(false);
+
+  function handleEdit(event: MouseEvent) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    event.preventDefault();
+    void goto(resolve("/editor"), { state: { resumeId: resume._id } });
+  }
 
   async function handleDelete() {
     isDeleting = true;
@@ -32,7 +42,7 @@
   </div>
 
   <div class="resume-card-actions">
-    <a class="btn btn-secondary" href={resolve("/editor")}>Edit</a>
+    <a class="btn btn-secondary" href={resolve("/editor")} onclick={handleEdit}>Edit</a>
     <button type="button" class="btn btn-danger" onclick={handleDelete} disabled={isDeleting}>
       {isDeleting ? "Deleting…" : "Delete"}
     </button>

@@ -1,18 +1,23 @@
 import type { Resume } from "../src/lib/schemas";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 // nub --env-file=.env scripts/insertTestResume.ts
 
 const email = "test@example.com";
 const password = "password";
 
-const resume: Omit<Resume, "user_id"> = {
-  _id: "script-created-resume-id",
+type TestResume = Omit<Resume, "_id"> & {
+  _id: ObjectId;
+};
+
+const resume: TestResume = {
+  _id: new ObjectId("686d8b3d5b6c1d2e3f4a5b6c"),
+  user_id: "", // Override later
   title: "Software Engineer Resume",
   subtitle: [
-    { label: "Email", value: "alex.dombroski@example.com" },
+    { label: "Email", value: "test@example.com" },
     { label: "Phone", value: "(415) 555-2671" },
-    { label: "LinkedIn", value: "linkedin.com/in/alexdombroski" }
+    { label: "LinkedIn", value: "linkedin.com/in/example" }
   ],
   sections: [
     {
@@ -163,7 +168,7 @@ async function main() {
   try {
     const dbName = getRequiredEnv("DATABASE_NAME");
     const db = client.db(dbName);
-    const resumes = db.collection<Resume>("resumes");
+    const resumes = db.collection<TestResume>("resumes");
 
     const result = await resumes.insertOne({ ...resume, user_id: user.id });
 

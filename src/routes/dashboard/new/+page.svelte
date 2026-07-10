@@ -28,7 +28,9 @@
       return;
     }
 
-    await goto(resolve("/editor"));
+    const created = await res.json();
+
+    await goto(resolve("/editor"), { state: { resumeId: created._id } });
   }
 </script>
 
