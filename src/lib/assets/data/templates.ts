@@ -2,7 +2,7 @@ import type { Resume } from "$lib/schemas";
 
 export type ResumeTemplate = Omit<
   Resume,
-  "_id" | "createdAt" | "updatedAt" | "font" | "spacing"
+  "_id" | "createdAt" | "updatedAt" | "font" | "spacing" | "user_id"
 > & {
   template: string;
   summary: string;
