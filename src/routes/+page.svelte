@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
+  import LoginDialog from "$lib/components/LoginDialog.svelte";
 
   const stats = [
     { label: "One master resume", value: "01" },
@@ -26,6 +27,8 @@
       body: "Export a clean, role-specific resume in seconds without touching the master copy — keeping every version in sync."
     }
   ];
+
+  let loginOpen = $state(false);
 </script>
 
 <Header />
@@ -129,9 +132,13 @@
       <p class="section-label">Get started today</p>
       <h2 id="cta-title">Your next role starts with a better resume.</h2>
       <p>Create your free account and build your master resume in under 10 minutes.</p>
-      <a class="btn btn-primary" href={resolve("/sign-in")}>Create free account</a>
+      <button class="btn btn-primary" onclick={() => (loginOpen = true)} type="button"
+        >Create free account</button
+      >
     </div>
   </section>
 </main>
+
+<LoginDialog bind:open={loginOpen} />
 
 <Footer />
