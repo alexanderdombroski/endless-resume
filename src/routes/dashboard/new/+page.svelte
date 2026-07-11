@@ -6,6 +6,12 @@
   import ResumeTemplate from "$lib/components/dashboard/ResumeTemplate.svelte";
   import { templates } from "$lib/assets/data/templates";
 
+  const DEFAULT_SPACING = { bullet: 1, section: 1.5 };
+  const DEFAULT_FONT = {
+    family: "Inter",
+    sizes: { title: 22, heading: 14, bullet: 11 }
+  };
+
   let selectedTemplate = $state<string | null>(null);
   let isCreating = $state(false);
   let errorMessage = $state<string | null>(null);
@@ -13,13 +19,22 @@
   async function handleCreate() {
     if (!selectedTemplate) return;
 
+    const template = templates.find((t) => t.template === selectedTemplate);
+    if (!template) return;
+
     isCreating = true;
     errorMessage = null;
 
     const res = await fetch("/api/resumes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ templateName: selectedTemplate })
+      body: JSON.stringify({
+        title: template.title,
+        subtitle: template.subtitle,
+        sections: template.sections,
+        spacing: DEFAULT_SPACING,
+        font: DEFAULT_FONT
+      })
     });
 
     if (!res.ok) {
