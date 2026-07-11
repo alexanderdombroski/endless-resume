@@ -5,11 +5,13 @@
   let {
     resume = $bindable(),
     activeSectionIndex = $bindable(0),
-    isEditing = $bindable(false)
+    isEditing = $bindable(false),
+    onSave
   }: {
     resume: Resume;
     activeSectionIndex?: number | null;
     isEditing?: boolean;
+    onSave?: () => Promise<void>;
   } = $props();
 
   // Component UI State
@@ -23,14 +25,20 @@
   // Save button animation state
   let saveStatus = $state<"idle" | "saving" | "saved">("idle");
 
-  function simulateSave() {
+  async function handleSave() {
+    if (!onSave) return;
+
     saveStatus = "saving";
-    setTimeout(() => {
+
+    try {
+      await onSave();
       saveStatus = "saved";
       setTimeout(() => {
         saveStatus = "idle";
       }, 2000);
-    }, 800);
+    } catch {
+      saveStatus = "idle";
+    }
   }
 
   // --- Subtitle (Contact info) operations ---
@@ -291,7 +299,7 @@
         class="btn save-btn"
         class:saving={saveStatus === "saving"}
         class:saved={saveStatus === "saved"}
-        onclick={simulateSave}
+        onclick={handleSave}
         disabled={saveStatus === "saving"}
       >
         {#if saveStatus === "idle"}

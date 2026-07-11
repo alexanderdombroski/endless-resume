@@ -1,118 +1,18 @@
 <script lang="ts">
+  import { page } from "$app/state";
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import EditorForm from "$lib/components/editor/EditorForm.svelte";
   import EditorSuggestions from "$lib/components/editor/EditorSuggestions.svelte";
+  import EditorSkeleton from "$lib/components/editor/EditorSkeleton.svelte";
   import type { Resume } from "$lib/schemas";
 
-  // Initialize starter resume with default values matching the type schema
-  let resume = $state<Resume>({
-    _id: "starter-resume-id",
-    title: "Software Engineer Resume",
-    subtitle: [
-      { label: "Email", value: "alex.dombroski@example.com" },
-      { label: "Phone", value: "(415) 555-2671" },
-      { label: "LinkedIn", value: "linkedin.com/in/alexdombroski" }
-    ],
-    sections: [
-      {
-        type: "text",
-        title: "Professional Summary",
-        entries: [
-          {
-            type: "text",
-            heading: "",
-            content:
-              "Results-driven Software Engineer with 4+ years of experience specializing in building responsive, state-of-the-art web applications. Proven track record in optimizing web performance and deploying scalable frontend architectures."
-          }
-        ]
-      },
-      {
-        type: "timeline",
-        title: "Work Experience",
-        entries: [
-          {
-            type: "timeline",
-            heading: "Senior Software Engineer",
-            subheading: "Tech Innovations Inc.",
-            location: "San Francisco, CA",
-            startDate: "2022-03",
-            endDate: "Present",
-            bullets: [
-              "Led the migration of a legacy monolithic frontend to SvelteKit, increasing page load speed by 45%.",
-              "Implemented an automated CI/CD pipeline reducing release cycle times by 30%.",
-              "Collaborated with product designers to build a reusable component library following accessibility guidelines."
-            ]
-          }
-        ]
-      },
-      {
-        type: "timeline",
-        title: "Education",
-        entries: [
-          {
-            type: "timeline",
-            heading: "B.S. in Computer Science",
-            subheading: "Stanford University",
-            location: "Stanford, CA",
-            startDate: "2018-09",
-            endDate: "2022-06",
-            bullets: []
-          }
-        ]
-      },
-      {
-        type: "structured",
-        title: "Projects",
-        entries: [
-          {
-            type: "structured",
-            heading: "Tailored Resume Builder",
-            startDate: "2023-05",
-            endDate: "2023-11",
-            bullets: [
-              "Architected a responsive single-page editor in Svelte 5 for editing multi-section documents.",
-              "Designed schemas utilizing Zod to validate document state and font styles on the client-side."
-            ]
-          }
-        ]
-      },
-      {
-        type: "list",
-        title: "Skills",
-        entries: [
-          {
-            type: "list",
-            heading: "",
-            items: [
-              "TypeScript",
-              "JavaScript",
-              "Svelte",
-              "SvelteKit",
-              "CSS/HTML",
-              "Node.js",
-              "REST APIs",
-              "Git"
-            ]
-          }
-        ]
-      }
-    ],
-    spacing: {
-      bullet: 4,
-      section: 16
-    },
-    font: {
-      family: "Inter",
-      sizes: {
-        title: 24,
-        heading: 14,
-        bullet: 10
-      }
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  });
+  const initialResumeId = page.state.resumeId || "686d8b3d5b6c1d2e3f4a5b6c";
+
+  let resume = $state<Resume | null>(null);
+  let loadError = $state<string | null>(null);
+  let saveError = $state<string | null>(null);
+  let isLoading = $state(true);
 
   // Track the active section index.
   // 0 corresponds to Basics. Section index 0, 1, 2... corresponds to resume.sections indexes.
@@ -120,6 +20,68 @@
 
   // Track if any field in EditorForm is focused / actively edited
   let isEditing = $state(false);
+
+  async function saveResume() {
+    if (!resume) {
+      throw new Error("No resume loaded");
+    }
+
+    saveError = null;
+
+    const res = await fetch(`/api/resumes/${resume._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: resume.title,
+        subtitle: resume.subtitle,
+        sections: resume.sections,
+        spacing: resume.spacing,
+        font: resume.font
+      })
+    });
+
+    if (!res.ok) {
+      saveError = "Failed to save resume. Please try again.";
+      throw new Error(`Resume save failed with status ${res.status}`);
+    }
+
+    const { updatedAt } = (await res.json()) as { updatedAt: string };
+    resume.updatedAt = updatedAt;
+  }
+
+  async function loadResume(resumeId: string) {
+    isLoading = true;
+    loadError = null;
+    resume = null;
+
+    try {
+      const res = await fetch(`/api/resumes/${resumeId}`);
+      if (!res.ok) {
+        throw new Error(`Resume request failed with status ${res.status}`);
+      }
+
+      const { resume: loadedResume } = (await res.json()) as { resume: Resume };
+
+      resume = loadedResume;
+      isLoading = false;
+    } catch {
+      loadError = `Failed to load resume`;
+      isLoading = false;
+    }
+  }
+
+  $effect(() => {
+    const resumeId = initialResumeId;
+
+    if (!resumeId) {
+      loadError = null;
+      isLoading = false;
+      activeSectionIndex = 0;
+      return;
+    }
+
+    void loadResume(resumeId);
+  });
 </script>
 
 <svelte:head>
@@ -131,74 +93,86 @@
 
 <main class="editor-main">
   <div class="editor-shell">
-    <!-- Sidebar panel -->
-    <aside class="editor-sidebar" aria-label="Resume sections">
-      <div class="sidebar-header">
-        <p class="sidebar-label">Sections</p>
-      </div>
-      <nav class="sidebar-nav" aria-label="Resume section navigation">
-        <!-- Basics section toggle -->
-        <button
-          class="sidebar-item"
-          class:active={activeSectionIndex === 0 ||
-            activeSectionIndex === -1 ||
-            activeSectionIndex === null}
-          onclick={() => (activeSectionIndex = 0)}
-        >
-          <span class="sidebar-item-dot" aria-hidden="true"></span>
-          Basics & Contact
-        </button>
+    {#if loadError}
+      <p class="editor-error" role="alert">{loadError}</p>
+    {/if}
 
-        <!-- Dynamic sections toggle -->
-        {#each resume.sections as section, index (index)}
+    {#if saveError}
+      <p class="editor-error" role="alert">{saveError}</p>
+    {/if}
+
+    {#if isLoading || !resume}
+      <EditorSkeleton />
+    {:else}
+      <!-- Sidebar panel -->
+      <aside class="editor-sidebar" aria-label="Resume sections">
+        <div class="sidebar-header">
+          <p class="sidebar-label">Sections</p>
+        </div>
+        <nav class="sidebar-nav" aria-label="Resume section navigation">
+          <!-- Basics section toggle -->
           <button
             class="sidebar-item"
-            class:active={activeSectionIndex === index + 1}
-            onclick={() => (activeSectionIndex = index + 1)}
+            class:active={activeSectionIndex === 0 ||
+              activeSectionIndex === -1 ||
+              activeSectionIndex === null}
+            onclick={() => (activeSectionIndex = 0)}
           >
             <span class="sidebar-item-dot" aria-hidden="true"></span>
-            {section.title || `Section ${index + 1}`}
+            Basics & Contact
           </button>
-        {/each}
-      </nav>
 
-      <div class="sidebar-footer">
-        <div class="sidebar-helper-card">
-          <span class="card-badge">Tips</span>
-          <p>
-            Click sections in this sidebar to quickly jump directly to their fields in the form.
-          </p>
+          <!-- Dynamic sections toggle -->
+          {#each resume.sections as section, index (index)}
+            <button
+              class="sidebar-item"
+              class:active={activeSectionIndex === index + 1}
+              onclick={() => (activeSectionIndex = index + 1)}
+            >
+              <span class="sidebar-item-dot" aria-hidden="true"></span>
+              {section.title || `Section ${index + 1}`}
+            </button>
+          {/each}
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-helper-card">
+            <span class="card-badge">Tips</span>
+            <p>
+              Click sections in this sidebar to quickly jump directly to their fields in the form.
+            </p>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
 
-    <!-- Main editor canvas (renders the EditorForm component directly) -->
-    <section class="editor-canvas" aria-labelledby="editor-title">
-      <EditorForm bind:resume bind:activeSectionIndex bind:isEditing />
-    </section>
+      <!-- Main editor canvas (renders the EditorForm component directly) -->
+      <section class="editor-canvas" aria-labelledby="editor-title">
+        <EditorForm bind:resume bind:activeSectionIndex bind:isEditing onSave={saveResume} />
+      </section>
 
-    <!-- Right panel: job description / AI suggestions -->
-    <aside class="editor-panel" aria-label="AI tailoring panel">
-      <div class="panel-header">
-        <p class="sidebar-label">Tailor for role</p>
-      </div>
-      <div class="panel-body">
-        <div class="panel-field">
-          <label class="panel-field-label" for="job-description">Paste job description</label>
-          <textarea
-            id="job-description"
-            class="panel-textarea"
-            placeholder="Paste a job posting here and the editor will highlight the most relevant sections of your resume…"
-            disabled
-            rows="8"></textarea>
+      <!-- Right panel: job description / AI suggestions -->
+      <aside class="editor-panel" aria-label="AI tailoring panel">
+        <div class="panel-header">
+          <p class="sidebar-label">Tailor for role</p>
         </div>
-        <button class="btn btn-primary panel-btn" disabled>Analyze job posting</button>
+        <div class="panel-body">
+          <div class="panel-field">
+            <label class="panel-field-label" for="job-description">Paste job description</label>
+            <textarea
+              id="job-description"
+              class="panel-textarea"
+              placeholder="Paste a job posting here and the editor will highlight the most relevant sections of your resume…"
+              disabled
+              rows="8"></textarea>
+          </div>
+          <button class="btn btn-primary panel-btn" disabled>Analyze job posting</button>
 
-        <div class="panel-suggestions" aria-label="AI suggestions">
-          <EditorSuggestions bind:resume {isEditing} />
+          <div class="panel-suggestions" aria-label="AI suggestions">
+            <EditorSuggestions bind:resume {isEditing} />
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    {/if}
   </div>
 </main>
 
@@ -219,6 +193,16 @@
     grid-template-columns: 220px 1fr 280px;
     min-height: inherit;
     border-top: 1px solid var(--color-border);
+  }
+
+  .editor-error {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    background: #fef2f2;
+    border-bottom: 1px solid #fecaca;
+    color: #b91c1c;
+    font-size: 0.85rem;
   }
 
   /* === Sidebar === */

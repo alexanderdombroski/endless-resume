@@ -30,6 +30,7 @@ function templateToResume(template: ResumeTemplate, title?: string): Resume {
   const now = new Date().toISOString();
   return {
     _id: randomUUID(),
+    user_id: "",
     title: title ?? template.title,
     subtitle: template.subtitle,
     sections: template.sections,
