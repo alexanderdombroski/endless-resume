@@ -1,26 +1,24 @@
 // src/lib/db/models/resume.model.ts
-import { ObjectId, type Collection, type Document } from "mongodb";
+import { ObjectId, type Collection } from "mongodb";
 import { getDb } from "$lib/db/mongo";
-import { ResumeSchema, type Resume } from "$lib/schemas";
+import { ResumeSchema, type CreateResumeInput, type Resume } from "$lib/schemas";
 
 const COLLECTION_NAME = "resumes";
 
 export type ResumeDocument = Omit<Resume, "_id"> & {
   _id: ObjectId;
-  userId?: ObjectId;
 };
 
 function serializeResume(doc: ResumeDocument): Resume {
   return ResumeSchema.parse({
     ...doc,
-    _id: doc._id.toString(),
-    userId: doc.userId?.toString()
+    _id: doc._id.toHexString()
   });
 }
 
 function toObjectId(id: string): ObjectId {
   if (!ObjectId.isValid(id)) {
-    throw new Error("Invalid ObjectId");
+    throw new Error("Invalid resume ID");
   }
 
   return new ObjectId(id);
@@ -34,64 +32,66 @@ async function getResumeCollection(): Promise<Collection<ResumeDocument>> {
 export async function findResumesByUserId(userId: string): Promise<Resume[]> {
   const collection = await getResumeCollection();
 
-  const docs = await collection
-    .find({ userId: toObjectId(userId) } as Document)
-    .sort({ updatedAt: -1 })
+  const documents = await collection
+    .find({
+      user_id: userId
+    })
+    .sort({
+      updatedAt: -1
+    })
     .toArray();
 
-  return docs.map(serializeResume);
+  return documents.map(serializeResume);
 }
 
 export async function findResumeById(id: string): Promise<Resume | null> {
   const collection = await getResumeCollection();
 
-  const doc = await collection.findOne({
+  const document = await collection.findOne({
     _id: toObjectId(id)
   });
 
-  return doc ? serializeResume(doc) : null;
+  return document ? serializeResume(document) : null;
 }
 
 export async function findResumeByIdAndUserId(id: string, userId: string): Promise<Resume | null> {
   const collection = await getResumeCollection();
 
-  const doc = await collection.findOne({
+  const document = await collection.findOne({
     _id: toObjectId(id),
-    userId: toObjectId(userId)
-  } as Document);
+    user_id: userId
+  });
 
-  return doc ? serializeResume(doc) : null;
+  return document ? serializeResume(document) : null;
 }
 
-export async function createResume(
-  data: Omit<Resume, "_id" | "createdAt" | "updatedAt">,
-  userId?: string
-): Promise<Resume> {
+export async function createResume(data: CreateResumeInput, userId: string): Promise<Resume> {
   const collection = await getResumeCollection();
-
   const now = new Date().toISOString();
 
-  const doc: ResumeDocument = {
+  const document: ResumeDocument = {
     ...data,
     _id: new ObjectId(),
-    ...(userId ? { userId: toObjectId(userId) } : {}),
+    user_id: userId,
     createdAt: now,
     updatedAt: now
   };
 
-  await collection.insertOne(doc);
+  await collection.insertOne(document);
 
-  return serializeResume(doc);
+  return serializeResume(document);
 }
 
 export async function updateResumeById(
   id: string,
-  data: Partial<Omit<Resume, "_id" | "createdAt" | "updatedAt">>
+  data: Partial<CreateResumeInput>
 ): Promise<Resume | null> {
   const collection = await getResumeCollection();
 
   const result = await collection.findOneAndUpdate(
-    { _id: toObjectId(id) },
+    {
+      _id: toObjectId(id)
+    },
     {
       $set: {
         ...data,
@@ -109,15 +109,15 @@ export async function updateResumeById(
 export async function updateResumeByIdAndUserId(
   id: string,
   userId: string,
-  data: Partial<Omit<Resume, "_id" | "createdAt" | "updatedAt">>
+  data: Partial<CreateResumeInput>
 ): Promise<Resume | null> {
   const collection = await getResumeCollection();
 
   const result = await collection.findOneAndUpdate(
     {
       _id: toObjectId(id),
-      userId: toObjectId(userId)
-    } as Document,
+      user_id: userId
+    },
     {
       $set: {
         ...data,
@@ -147,8 +147,8 @@ export async function deleteResumeByIdAndUserId(id: string, userId: string): Pro
 
   const result = await collection.deleteOne({
     _id: toObjectId(id),
-    userId: toObjectId(userId)
-  } as Document);
+    user_id: userId
+  });
 
   return result.deletedCount === 1;
 }
