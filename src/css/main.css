@@ -20,6 +20,18 @@
   --max-w: 1200px;
 }
 
+/* Printing*/
+@media print {
+  .site-header,
+  .site-footer {
+    display: none !important;
+  }
+}
+
+@page {
+  margin: 0.75in;
+}
+
 /*Global buttons*/
 .btn {
   display: inline-flex;
