@@ -1,17 +1,52 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { resolve } from "$app/paths";
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import ResumeCard from "$lib/components/dashboard/ResumeCard.svelte";
   import type { Resume } from "$lib/schemas";
-  import type { PageProps } from "./$types";
+  // import type { PageProps } from "./$types";
 
-  let { data }: PageProps = $props();
+  type GetResumesResponse = { resumes: Resume[]; page: number; offset: number; returned: number };
 
-  let resumes = $derived<Resume[]>(data.resumes);
+  // let { data }: PageProps = $props();
+
+  let resumes = $state<Resume[]>([]);
   let errorMessage = $state<string | null>(null);
+  let isLoading = $state(true);
 
-  let isEmpty = $derived(resumes.length === 0);
+  let isEmpty = $derived(!isLoading && resumes.length === 0);
+
+  let page = $state(1);
+  let offset = $state(0);
+  let returned = $state(0);
+
+  async function loadResumes() {
+    isLoading = true;
+    errorMessage = null;
+
+    try {
+      const params = new URLSearchParams({ page: page.toString(), offset: offset.toString() });
+      const response = await fetch(`/api/resumes?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data: GetResumesResponse = await response.json();
+
+      resumes = data.resumes;
+      page = data.page;
+      offset = data.offset;
+      returned = data.returned;
+    } catch (error) {
+      console.error("Failed to load resumes:", error);
+      errorMessage = "Could not load your resumes. Please try again.";
+      resumes = [];
+    } finally {
+      isLoading = false;
+    }
+  }
 
   async function handleDelete(id: string) {
     errorMessage = null;
@@ -22,6 +57,10 @@
     }
     resumes = resumes.filter((resume) => resume._id !== id);
   }
+
+  onMount(() => {
+    void loadResumes();
+  });
 </script>
 
 <svelte:head>
@@ -38,17 +77,22 @@
         <h1>My Resumes</h1>
         <p class="dashboard-subtitle">Create, open, and manage your resumes.</p>
       </div>
-      <a class="btn btn-primary" href={resolve("/dashboard/new")}>Create new resume</a>
+      <a class="btn btn-primary" href={resolve("/dashboard/new")}> Create new resume </a>
     </div>
-
     {#if errorMessage}
-      <p class="dashboard-error" role="alert">{errorMessage}</p>
+      <div class="dashboard-error" role="alert">
+        <p>{errorMessage}</p>
+        <button class="btn" type="button" onclick={() => void loadResumes()}> Try again </button>
+      </div>
     {/if}
-
-    {#if isEmpty}
+    {#if isLoading}
+      <div class="dashboard-loading" aria-live="polite">
+        <p>Loading resumes...</p>
+      </div>
+    {:else if isEmpty}
       <div class="dashboard-empty">
         <p>You don't have any resumes yet.</p>
-        <a class="btn btn-primary" href={resolve("/dashboard/new")}>Create your first resume</a>
+        <a class="btn btn-primary" href={resolve("/dashboard/new")}> Create your first resume </a>
       </div>
     {:else}
       <div class="dashboard-scroll">
@@ -58,6 +102,11 @@
           {/each}
         </div>
       </div>
+
+      <p class="dashboard-result-count">
+        Showing {returned}
+        {returned === 1 ? "resume" : "resumes"}
+      </p>
     {/if}
   </div>
 </main>

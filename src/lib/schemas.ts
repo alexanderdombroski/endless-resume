@@ -71,6 +71,15 @@ export const ResumeSchema = z.object({
   updatedAt: z.string()
 });
 
+export const CreateResumeSchema = ResumeSchema.omit({
+  _id: true,
+  user_id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type CreateResumeInput = z.infer<typeof CreateResumeSchema>;
+
 export type Resume = z.infer<typeof ResumeSchema>;
 export type Section = z.infer<typeof SectionSchema>;
 export type SectionType = (typeof SectionTypes)[number];

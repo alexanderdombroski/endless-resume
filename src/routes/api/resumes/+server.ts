@@ -1,43 +1,12 @@
-import { json } from "@sveltejs/kit";
-import { z } from "zod";
-
+import { json, type RequestHandler } from "@sveltejs/kit";
 import { auth } from "$lib/auth/auth";
 import { getDb } from "$lib/db/mongo";
-import { SectionSchema } from "$lib/schemas";
-import type { OptionalId } from "mongodb";
-import type { ResumeDocument } from "$lib/db/models/resume.model";
+import { CreateResumeSchema } from "$lib/schemas";
+import { createResume, type ResumeDocument } from "$lib/db/models/resume.model";
 
-type NewResumeDocument = OptionalId<ResumeDocument>;
-
-// Schema for validating resume data
-const ResumeBodySchema = z.object({
-  title: z.string().min(1),
-  subtitle: z.array(
-    z.object({
-      label: z.string(),
-      value: z.string()
-    })
-  ),
-  sections: z.array(SectionSchema),
-  spacing: z.object({
-    bullet: z.number().positive(),
-    section: z.number().positive()
-  }),
-  font: z.object({
-    family: z.string(),
-    sizes: z.object({
-      title: z.number().positive(),
-      heading: z.number().positive(),
-      bullet: z.number().positive()
-    })
-  })
-});
-
-// Helper function to create API errors
 function apiError(message: string, status = 500, errors?: unknown) {
   return json({ message, status, errors }, { status });
 }
-
 // Helper function to serialize resume data
 function serializeResume(resume: ResumeDocument) {
   return {
@@ -109,7 +78,7 @@ export async function GET({ request }) {
 
 // Create a new resume
 // POST /api/resumes
-export async function POST({ request }) {
+export const POST: RequestHandler = async ({ request }) => {
   const session = await auth.api.getSession({
     headers: request.headers
   });
@@ -118,34 +87,35 @@ export async function POST({ request }) {
     return apiError("Unauthorized", 401);
   }
 
-  const body = await request.json();
-  const parsed = ResumeBodySchema.safeParse(body);
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return apiError("Request body must be valid JSON", 400);
+  }
+
+  const parsed = CreateResumeSchema.safeParse(body);
 
   if (!parsed.success) {
     return apiError("Invalid resume data", 400, parsed.error.flatten());
   }
 
-  const now = new Date().toISOString();
+  try {
+    const resume = await createResume(parsed.data, session.user.id);
 
-  const resume = {
-    ...parsed.data,
-    user_id: session.user.id,
-    createdAt: now,
-    updatedAt: now
-  };
+    return json(
+      {
+        message: "Resume created successfully",
+        resume
+      },
+      {
+        status: 201
+      }
+    );
+  } catch (error) {
+    console.error("Failed to create resume:", error);
 
-  const db = await getDb();
-  const resumes = db.collection<NewResumeDocument>("resumes");
-
-  const result = await resumes.insertOne(resume);
-
-  return json(
-    {
-      message: "Resume created successfully",
-      _id: result.insertedId.toHexString(),
-      title: resume.title,
-      createdAt: resume.createdAt
-    },
-    { status: 201 }
-  );
-}
+    return apiError("Failed to create resume", 500);
+  }
+};

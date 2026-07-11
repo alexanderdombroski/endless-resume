@@ -275,3 +275,17 @@ export const templates: ResumeTemplate[] = [
     ]
   }
 ];
+
+export const defaultSpacing = {
+  bullet: 1,
+  section: 1.5
+};
+
+export const defaultFont = {
+  family: "Arial",
+  sizes: {
+    title: 28,
+    heading: 16,
+    bullet: 11
+  }
+};
