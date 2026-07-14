@@ -58,6 +58,24 @@
     resumes = resumes.filter((resume) => resume._id !== id);
   }
 
+  async function handleDuplicate(resume: Resume, title: string) {
+    errorMessage = null;
+
+    const response = await fetch(`/api/resumes/${resume._id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ title })
+    });
+
+    if (!response.ok) {
+      throw new Error("Could not duplicate resume.");
+    }
+
+    await loadResumes();
+  }
+
   onMount(() => {
     void loadResumes();
   });
@@ -98,7 +116,7 @@
       <div class="dashboard-scroll">
         <div class="dashboard-grid">
           {#each resumes as resume (resume._id)}
-            <ResumeCard {resume} ondelete={handleDelete} />
+            <ResumeCard {resume} ondelete={handleDelete} onduplicate={handleDuplicate} />
           {/each}
         </div>
       </div>

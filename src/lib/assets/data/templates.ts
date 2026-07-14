@@ -282,7 +282,7 @@ export const defaultSpacing = {
 };
 
 export const defaultFont = {
-  family: "Arial",
+  family: "Roboto",
   sizes: {
     title: 28,
     heading: 16,

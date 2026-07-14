@@ -20,20 +20,22 @@
       <span class="brand-mark" aria-hidden="true">ER</span>
       <div class="brand-copy">
         <p class="brand-name">Endless Resume</p>
-        <p class="brand-tagline">Resume Editor</p>
+        <!-- <p class="brand-tagline">Resume Editor</p> -->
       </div>
     </a>
 
     <nav class="site-nav" aria-label="Primary">
       <a class="nav-link" class:active={isActive(resolve("/"))} href={resolve("/")}>Home</a>
-      <a
-        class="nav-link"
-        class:active={isActive(resolve("/dashboard"))}
-        href={resolve("/dashboard")}>Dashboard</a
-      >
-      <a class="nav-link" class:active={isActive(resolve("/editor"))} href={resolve("/editor")}
-        >Editor</a
-      >
+      {#if $session.data?.user}
+        <a
+          class="nav-link"
+          class:active={isActive(resolve("/dashboard"))}
+          href={resolve("/dashboard")}>Dashboard</a
+        >
+        <!-- <a class="nav-link" class:active={isActive(resolve("/editor"))} href={resolve("/editor")}
+          >Editor</a
+        > -->
+      {/if}
 
       {#if $session.data?.user}
         <ProfilePopover />
