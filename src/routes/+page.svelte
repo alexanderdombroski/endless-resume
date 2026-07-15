@@ -2,7 +2,10 @@
   import { resolve } from "$app/paths";
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
+  import { authClient } from "$lib/auth/auth-client";
   import LoginDialog from "$lib/components/LoginDialog.svelte";
+
+  const session = authClient.useSession();
 
   const stats = [
     { label: "One master resume", value: "01" },
@@ -47,8 +50,11 @@
         entire document every time a posting changes.
       </p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href={resolve("/#how-it-works")}>Start your resume</a>
-        <a class="btn btn-secondary" href={resolve("/dashboard")}>Open dashboard</a>
+        {#if $session.data?.user}
+          <a class="btn btn-secondary" href={resolve("/dashboard")}>Open dashboard</a>
+        {:else}
+          <a class="btn btn-primary" href={resolve("/#cta-banner")}>Get Started Today!</a>
+        {/if}
       </div>
 
       <dl class="stats" aria-label="Product highlights">
@@ -99,11 +105,16 @@
       <div class="mockup tailored">
         <div class="chip chip-bottom">Version control included</div>
         <span class="card-tag card-tag-accent">Tailored version</span>
-        <h2>Senior product designer, AI tools</h2>
+        <h2>Senior product designer and UX Expert</h2>
         <ul>
-          <li>Emphasized prompt workflows and experimentation</li>
-          <li>Reordered impact bullets around product metrics</li>
-          <li>Matched language to the target job description</li>
+          <li>
+            Optimized user experience across multiple product lines, leading to 25% increase in user
+            satisfaction.
+          </li>
+          <li>
+            Mentored junior designers and facilitated design reviews, resulting in 50% fewer bugs.
+          </li>
+          <li>Created design systems that improved consistency across 5 development teams.</li>
         </ul>
         <div class="card-footer">
           <div class="card-icon">
@@ -215,14 +226,16 @@
   </section>
 
   <!-- CTA Banner -->
-  <section class="cta-banner" aria-labelledby="cta-title">
+  <section class="cta-banner" aria-labelledby="cta-title" id="cta-banner">
     <div class="cta-inner">
       <p class="section-label">Get started today</p>
       <h2 id="cta-title">Your next role starts with a better resume.</h2>
-      <p>Create your free account and build your master resume in under 10 minutes.</p>
-      <button class="btn btn-primary" onclick={() => (loginOpen = true)} type="button"
-        >Create free account</button
-      >
+      {#if !$session.data?.user}
+        <p>Create your free account and build your master resume in under 10 minutes.</p>
+        <button class="btn btn-primary" onclick={() => (loginOpen = true)} type="button"
+          >Create free account</button
+        >
+      {/if}
     </div>
   </section>
 </main>
