@@ -1,9 +1,11 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { goto } from "$app/navigation";
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import { authClient } from "$lib/auth/auth-client";
   import LoginDialog from "$lib/components/LoginDialog.svelte";
+  import { templates, defaultSpacing, defaultFont } from "$lib/assets/data/templates";
 
   const session = authClient.useSession();
 
@@ -17,21 +19,61 @@
     {
       number: "01",
       title: "Build your master resume",
-      body: "Write the definitive version of your experience once — every role, skill, and accomplishment in one place."
+      body: "Write the definitive version of your experience once — every role, skill, and accomplishment in one place.",
+      template: "Traditional Professional"
     },
     {
       number: "02",
       title: "Target a specific role",
-      body: "Paste a job description or choose a focus area and let the editor surface the sections that matter most for that posting."
+      body: "Paste a job description or choose a focus area and let the editor surface the sections that matter most for that posting.",
+      template: "Student & Early Career"
     },
     {
       number: "03",
       title: "Generate a tailored version",
-      body: "Export a clean, role-specific resume in seconds without touching the master copy — keeping every version in sync."
+      body: "Export a clean, role-specific resume in seconds without touching the master copy — keeping every version in sync.",
+      template: "Experienced Professional"
     }
   ];
 
   let loginOpen = $state(false);
+  let isCreating = $state(false);
+
+  async function handleFeatureClick(templateKey: string) {
+    if (!$session.data?.user) {
+      loginOpen = true;
+      return;
+    }
+
+    if (isCreating) return;
+    isCreating = true;
+
+    try {
+      const templateData = templates.find((t) => t.template === templateKey);
+      if (!templateData) return;
+
+      const response = await fetch("/api/resumes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          title: templateData.title || "Untitled Resume",
+          subtitle: templateData.subtitle,
+          sections: templateData.sections,
+          spacing: defaultSpacing,
+          font: defaultFont
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message ?? data.error ?? "Could not create resume.");
+
+      await goto(resolve("/editor"), { state: { resumeId: data.resume._id } });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      isCreating = false;
+    }
+  }
 </script>
 
 <Header />
@@ -161,7 +203,11 @@
 
     <div class="feature-grid">
       {#each features as f (f.number)}
-        <div class="feature-card">
+        <button
+          type="button"
+          class="feature-card"
+          onclick={() => void handleFeatureClick(f.template)}
+        >
           <span class="feature-number">{f.number}</span>
           <div class="feature-icon" aria-hidden="true">
             {#if f.number === "01"}
@@ -220,7 +266,7 @@
           </div>
           <h3>{f.title}</h3>
           <p>{f.body}</p>
-        </div>
+        </button>
       {/each}
     </div>
   </section>
@@ -243,3 +289,14 @@
 <LoginDialog bind:open={loginOpen} />
 
 <Footer />
+
+<style>
+  button.feature-card {
+    appearance: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+  }
+</style>
