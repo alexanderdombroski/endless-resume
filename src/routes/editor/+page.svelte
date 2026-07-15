@@ -412,4 +412,22 @@
       display: none;
     }
   }
+
+  /* Printing*/
+  @media print {
+    .editor-main {
+      min-height: 0;
+    }
+
+    .editor-shell {
+      display: block;
+      border-top: none;
+    }
+
+    .editor-sidebar,
+    .editor-panel,
+    .editor-error {
+      display: none;
+    }
+  }
 </style>

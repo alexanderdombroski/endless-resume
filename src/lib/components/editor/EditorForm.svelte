@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from "svelte";
   import type { Resume, Section, SubSection, SectionType } from "$lib/schemas";
   import { defaultFont, defaultSpacing } from "$lib/assets/data/templates";
 
@@ -40,6 +41,14 @@
     } catch {
       saveStatus = "idle";
     }
+  }
+
+  async function handlePrint() {
+    // The paper (resume content) only renders on the "content" tab, so switch
+    // to it before printing in case the user is on "Style Settings".
+    activeTab = "content";
+    await tick();
+    window.print();
   }
 
   // --- Subtitle (Contact info) operations ---
@@ -310,6 +319,23 @@
       />
     </div>
     <div class="actions">
+      <button type="button" class="btn btn-secondary print-btn" onclick={handlePrint}>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="6 9 6 2 18 2 18 9" />
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+          <rect x="6" y="14" width="12" height="8" />
+        </svg>
+        Print
+      </button>
       <button
         type="button"
         class="btn save-btn"
@@ -1031,6 +1057,21 @@
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--color-border);
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
   }
 
   .resume-title-input {
@@ -2059,6 +2100,45 @@
     }
     .sub-sep {
       display: none;
+    }
+  }
+
+  /* Printing*/
+  @media print {
+    .editor-form-container {
+      height: auto;
+    }
+
+    .form-header,
+    .form-tabs,
+    .floating-toolbar,
+    .tag-delete-btn,
+    .flat-add-link,
+    .add-section-footer {
+      display: none !important;
+    }
+
+    .form-scroll-body {
+      overflow: visible;
+      background: #ffffff;
+    }
+
+    .paper-workspace {
+      padding: 0;
+    }
+
+    .paper-page {
+      box-shadow: none;
+      border: none;
+      min-height: 0;
+      max-width: none;
+      padding: 0;
+    }
+
+    .flat-input,
+    .flat-textarea {
+      border-color: transparent !important;
+      background: transparent !important;
     }
   }
 </style>
