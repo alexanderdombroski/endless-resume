@@ -35,10 +35,14 @@
 
       const data: GetResumesResponse = await response.json();
 
-      resumes = data.resumes;
+      const uniqueResumes = data.resumes.filter(
+        (resume, index, self) => index === self.findIndex((r) => r._id === resume._id)
+      );
+
+      resumes = uniqueResumes;
       page = data.page;
       offset = data.offset;
-      returned = data.returned;
+      returned = uniqueResumes.length;
     } catch (error) {
       console.error("Failed to load resumes:", error);
       errorMessage = "Could not load your resumes. Please try again.";

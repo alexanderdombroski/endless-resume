@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { tick } from "svelte";
   import type { Resume, Section, SubSection, SectionType } from "$lib/schemas";
+  import { defaultFont, defaultSpacing } from "$lib/assets/data/templates";
 
   // Bindable props using Svelte 5 runes
   let {
@@ -39,6 +41,14 @@
     } catch {
       saveStatus = "idle";
     }
+  }
+
+  async function handlePrint() {
+    // The paper (resume content) only renders on the "content" tab, so switch
+    // to it before printing in case the user is on "Style Settings".
+    activeTab = "content";
+    await tick();
+    window.print();
   }
 
   // --- Subtitle (Contact info) operations ---
@@ -273,6 +283,21 @@
       }
     }, 100);
   }
+
+  function resetFormatting() {
+    resume.font = {
+      family: defaultFont.family,
+      sizes: {
+        title: defaultFont.sizes.title,
+        heading: defaultFont.sizes.heading,
+        bullet: defaultFont.sizes.bullet
+      }
+    };
+    resume.spacing = {
+      section: defaultSpacing.section,
+      bullet: defaultSpacing.bullet
+    };
+  }
 </script>
 
 <div
@@ -294,6 +319,23 @@
       />
     </div>
     <div class="actions">
+      <button type="button" class="btn btn-secondary print-btn" onclick={handlePrint}>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="6 9 6 2 18 2 18 9" />
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+          <rect x="6" y="14" width="12" height="8" />
+        </svg>
+        Print
+      </button>
       <button
         type="button"
         class="btn save-btn"
@@ -797,6 +839,24 @@
     {:else if activeTab === "style"}
       <!-- STYLE SETTINGS -->
       <div class="style-settings-panel">
+        <div class="style-settings-header">
+          <button type="button" class="btn btn-secondary reset-btn" onclick={resetFormatting}>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <polyline points="3 3 3 8 8 8" />
+            </svg>
+            Reset Formatting
+          </button>
+        </div>
         <section class="form-section-card open">
           <div class="section-card-header">
             <div class="header-title">
@@ -999,6 +1059,21 @@
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   }
 
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
   .resume-title-input {
     font-size: 1.15rem;
     font-weight: 700;
@@ -1126,6 +1201,28 @@
     flex-direction: column;
     gap: 1.5rem;
     box-sizing: border-box;
+  }
+
+  .style-settings-header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .reset-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+    cursor: pointer;
+  }
+
+  .reset-btn:hover {
+    color: var(--color-text);
+    border-color: #cbd5e1;
+    background: var(--color-surface);
   }
 
   .form-section-card {
@@ -2003,6 +2100,45 @@
     }
     .sub-sep {
       display: none;
+    }
+  }
+
+  /* Printing*/
+  @media print {
+    .editor-form-container {
+      height: auto;
+    }
+
+    .form-header,
+    .form-tabs,
+    .floating-toolbar,
+    .tag-delete-btn,
+    .flat-add-link,
+    .add-section-footer {
+      display: none !important;
+    }
+
+    .form-scroll-body {
+      overflow: visible;
+      background: #ffffff;
+    }
+
+    .paper-workspace {
+      padding: 0;
+    }
+
+    .paper-page {
+      box-shadow: none;
+      border: none;
+      min-height: 0;
+      max-width: none;
+      padding: 0;
+    }
+
+    .flat-input,
+    .flat-textarea {
+      border-color: transparent !important;
+      background: transparent !important;
     }
   }
 </style>

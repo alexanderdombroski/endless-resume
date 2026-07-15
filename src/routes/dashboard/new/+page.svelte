@@ -27,6 +27,9 @@
       return;
     }
 
+    const template = templates.find((t) => t.template === selectedTemplate);
+    if (!template) return;
+
     isCreating = true;
     errorMessage = null;
 

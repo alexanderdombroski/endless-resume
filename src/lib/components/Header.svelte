@@ -32,9 +32,6 @@
           class:active={isActive(resolve("/dashboard"))}
           href={resolve("/dashboard")}>Dashboard</a
         >
-        <!-- <a class="nav-link" class:active={isActive(resolve("/editor"))} href={resolve("/editor")}
-          >Editor</a
-        > -->
       {/if}
 
       {#if $session.data?.user}

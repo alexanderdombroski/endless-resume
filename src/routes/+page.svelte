@@ -77,7 +77,24 @@
           <li>Cut handoff time by 35% with tighter workflows</li>
         </ul>
         <div class="card-footer">
-          <div class="placeholder-avatar"></div>
+          <div class="card-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle
+                cx="12"
+                cy="7"
+                r="4"
+              /></svg
+            >
+          </div>
           <div class="placeholder-lines">
             <div class="ph-line ph-line-long"></div>
             <div class="ph-line ph-line-short"></div>
@@ -100,7 +117,24 @@
           <li>Created design systems that improved consistency across 5 development teams.</li>
         </ul>
         <div class="card-footer">
-          <div class="placeholder-avatar"></div>
+          <div class="card-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle
+                cx="12"
+                cy="7"
+                r="4"
+              /></svg
+            >
+          </div>
           <div class="placeholder-lines">
             <div class="ph-line ph-line-long"></div>
             <div class="ph-line ph-line-short"></div>
@@ -129,7 +163,61 @@
       {#each features as f (f.number)}
         <div class="feature-card">
           <span class="feature-number">{f.number}</span>
-          <div class="feature-placeholder" aria-hidden="true"></div>
+          <div class="feature-icon" aria-hidden="true">
+            {#if f.number === "01"}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path
+                  d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line
+                  x1="16"
+                  y1="17"
+                  x2="8"
+                  y2="17"
+                /><line x1="10" y1="9" x2="8" y2="9" /></svg
+              >
+            {:else if f.number === "02"}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle
+                  cx="12"
+                  cy="12"
+                  r="2"
+                /></svg
+              >
+            {:else}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path
+                  d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
+                /></svg
+              >
+            {/if}
+          </div>
           <h3>{f.title}</h3>
           <p>{f.body}</p>
         </div>
