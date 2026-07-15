@@ -1,13 +1,13 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import EditorForm from "$lib/components/editor/EditorForm.svelte";
   import EditorSuggestions from "$lib/components/editor/EditorSuggestions.svelte";
   import EditorSkeleton from "$lib/components/editor/EditorSkeleton.svelte";
   import type { Resume } from "$lib/schemas";
-
-  const initialResumeId = page.state.resumeId || "686d8b3d5b6c1d2e3f4a5b6c";
 
   let resume = $state<Resume | null>(null);
   let loadError = $state<string | null>(null);
@@ -71,12 +71,10 @@
   }
 
   $effect(() => {
-    const resumeId = initialResumeId;
+    const resumeId = page.state.resumeId;
 
     if (!resumeId) {
-      loadError = null;
-      isLoading = false;
-      activeSectionIndex = 0;
+      goto(resolve("/dashboard"));
       return;
     }
 

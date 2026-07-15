@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import type { Resume, Section, SubSection, SectionType } from "$lib/schemas";
+  import { defaultFont, defaultSpacing } from "$lib/assets/data/templates";
 
   // Bindable props using Svelte 5 runes
   let {
@@ -281,6 +282,21 @@
         isEditing = false;
       }
     }, 100);
+  }
+
+  function resetFormatting() {
+    resume.font = {
+      family: defaultFont.family,
+      sizes: {
+        title: defaultFont.sizes.title,
+        heading: defaultFont.sizes.heading,
+        bullet: defaultFont.sizes.bullet
+      }
+    };
+    resume.spacing = {
+      section: defaultSpacing.section,
+      bullet: defaultSpacing.bullet
+    };
   }
 </script>
 
@@ -823,6 +839,24 @@
     {:else if activeTab === "style"}
       <!-- STYLE SETTINGS -->
       <div class="style-settings-panel">
+        <div class="style-settings-header">
+          <button type="button" class="btn btn-secondary reset-btn" onclick={resetFormatting}>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <polyline points="3 3 3 8 8 8" />
+            </svg>
+            Reset Formatting
+          </button>
+        </div>
         <section class="form-section-card open">
           <div class="section-card-header">
             <div class="header-title">
@@ -1167,6 +1201,28 @@
     flex-direction: column;
     gap: 1.5rem;
     box-sizing: border-box;
+  }
+
+  .style-settings-header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .reset-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-text-muted);
+    border-color: var(--color-border);
+    cursor: pointer;
+  }
+
+  .reset-btn:hover {
+    color: var(--color-text);
+    border-color: #cbd5e1;
+    background: var(--color-surface);
   }
 
   .form-section-card {

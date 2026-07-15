@@ -4,12 +4,18 @@
   import Header from "$lib/components/Header.svelte";
   import Footer from "$lib/components/Footer.svelte";
   import ResumeTemplate from "$lib/components/dashboard/ResumeTemplate.svelte";
-  import { templates } from "$lib/assets/data/templates";
+  import { templates, defaultSpacing, defaultFont } from "$lib/assets/data/templates";
+  import type { Resume } from "$lib/schemas";
 
-  const DEFAULT_SPACING = { bullet: 1, section: 1.5 };
-  const DEFAULT_FONT = {
-    family: "Inter",
-    sizes: { title: 22, heading: 14, bullet: 11 }
+  type CreateResumeResponse = {
+    message: string;
+    resume: Resume;
+  };
+
+  type ApiErrorResponse = {
+    message?: string;
+    error?: string;
+    errors?: unknown;
   };
 
   let selectedTemplate = $state<string | null>(null);
@@ -17,7 +23,9 @@
   let errorMessage = $state<string | null>(null);
 
   async function handleCreate() {
-    if (!selectedTemplate) return;
+    if (!selectedTemplate || isCreating) {
+      return;
+    }
 
     const template = templates.find((t) => t.template === selectedTemplate);
     if (!template) return;
@@ -25,27 +33,57 @@
     isCreating = true;
     errorMessage = null;
 
-    const res = await fetch("/api/resumes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: template.title,
-        subtitle: template.subtitle,
-        sections: template.sections,
-        spacing: DEFAULT_SPACING,
-        font: DEFAULT_FONT
-      })
-    });
+    try {
+      const selectedTemplateData = templates.find((t) => t.template === selectedTemplate);
 
-    if (!res.ok) {
-      errorMessage = "Could not create resume. Please try again.";
+      if (!selectedTemplateData) {
+        throw new Error("Selected template not found.");
+      }
+
+      const response = await fetch("/api/resumes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          title: selectedTemplateData.title || "Untitled Resume",
+          subtitle: selectedTemplateData.subtitle,
+          sections: selectedTemplateData.sections,
+          spacing: defaultSpacing,
+          font: defaultFont
+        })
+      });
+
+      const data = (await response.json()) as CreateResumeResponse | ApiErrorResponse;
+
+      console.log("Resume creation response:", data);
+
+      if (!response.ok) {
+        const errorData = data as ApiErrorResponse;
+
+        throw new Error(errorData.message ?? errorData.error ?? "Could not create resume.");
+      }
+
+      const successData = data as CreateResumeResponse;
+      const resumeId = successData.resume._id;
+
+      if (!resumeId) {
+        throw new Error("The resume was created, but no ID was returned.");
+      }
+
+      await goto(resolve("/editor"), {
+        state: {
+          resumeId
+        }
+      });
+    } catch (error) {
+      console.error("Failed to create resume:", error);
+
+      errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+    } finally {
       isCreating = false;
-      return;
     }
-
-    const created = await res.json();
-
-    await goto(resolve("/editor"), { state: { resumeId: created._id } });
   }
 </script>
 
@@ -62,7 +100,6 @@
       <h1>Choose a template</h1>
       <p class="new-resume-subtitle">Pick a starting point for your new resume.</p>
     </div>
-
     {#if errorMessage}
       <p class="new-resume-error" role="alert">{errorMessage}</p>
     {/if}
@@ -72,7 +109,11 @@
         <ResumeTemplate
           templateData={template}
           selected={selectedTemplate === template.template}
-          onclick={() => (selectedTemplate = template.template)}
+          onclick={() => {
+            if (!isCreating) {
+              selectedTemplate = template.template;
+            }
+          }}
         />
       {/each}
     </div>
@@ -82,6 +123,7 @@
         type="button"
         class="btn btn-primary"
         disabled={!selectedTemplate || isCreating}
+        aria-busy={isCreating}
         onclick={handleCreate}
       >
         {isCreating ? "Creating…" : "Use this template"}
