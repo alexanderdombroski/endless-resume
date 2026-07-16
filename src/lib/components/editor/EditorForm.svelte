@@ -515,49 +515,7 @@
                 class="section-block"
                 style="margin-bottom: var(--spacing-section);"
               >
-                <!-- Floating Toolbar on Left Margin -->
-                <div class="floating-toolbar section-toolbar">
-                  <button
-                    type="button"
-                    class="tool-btn"
-                    disabled={secIdx === 0}
-                    onclick={(e) => {
-                      e.stopPropagation();
-                      moveSectionUp(secIdx);
-                    }}
-                    title="Move Section Up">▲</button
-                  >
-                  <button
-                    type="button"
-                    class="tool-btn"
-                    disabled={secIdx === resume.sections.length - 1}
-                    onclick={(e) => {
-                      e.stopPropagation();
-                      moveSectionDown(secIdx);
-                    }}
-                    title="Move Section Down">▼</button
-                  >
-                  <button
-                    type="button"
-                    class="tool-btn delete"
-                    onclick={(e) => {
-                      e.stopPropagation();
-                      removeSection(secIdx);
-                    }}
-                    title="Delete Section">✕</button
-                  >
-                  <button
-                    type="button"
-                    class="tool-btn add"
-                    onclick={(e) => {
-                      e.stopPropagation();
-                      addEntry(secIdx);
-                    }}
-                    title="Add Entry">+ Entry</button
-                  >
-                </div>
-
-                <!-- Section Flat Header -->
+                <!-- Section Flat Header with inline toolbar -->
                 <div class="section-flat-header">
                   <input
                     type="text"
@@ -565,6 +523,104 @@
                     class="flat-input section-title-input"
                     placeholder="Section Title"
                   />
+                  <div class="section-inline-toolbar">
+                    <button
+                      type="button"
+                      class="section-tool-btn"
+                      disabled={secIdx === 0}
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        moveSectionUp(secIdx);
+                      }}
+                      title="Move Section Up"
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"><polyline points="18 15 12 9 6 15" /></svg
+                      >
+                    </button>
+                    <span class="section-tool-sep"></span>
+                    <button
+                      type="button"
+                      class="section-tool-btn"
+                      disabled={secIdx === resume.sections.length - 1}
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        moveSectionDown(secIdx);
+                      }}
+                      title="Move Section Down"
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"><polyline points="6 9 12 15 18 9" /></svg
+                      >
+                    </button>
+                    <span class="section-tool-sep"></span>
+                    <button
+                      type="button"
+                      class="section-tool-btn delete"
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        removeSection(secIdx);
+                      }}
+                      title="Delete Section"
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><polyline points="3 6 5 6 21 6" /><path
+                          d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
+                        /><path d="M10 11v6" /><path d="M14 11v6" /><path
+                          d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"
+                        /></svg
+                      >
+                    </button>
+                    <span class="section-tool-sep"></span>
+                    <button
+                      type="button"
+                      class="section-tool-btn add"
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        addEntry(secIdx);
+                      }}
+                      title="Add Entry"
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><line x1="12" y1="5" x2="12" y2="19" /><line
+                          x1="5"
+                          y1="12"
+                          x2="19"
+                          y2="12"
+                        /></svg
+                      >
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Section Entries -->
@@ -572,7 +628,7 @@
                   {#if section.entries.length === 0}
                     <div class="flat-empty-state">
                       <span
-                        >Empty Section. Click "+ Entry" in the left margin toolbar to add content.</span
+                        >Empty section — click <strong>+</strong> in the toolbar above to add an entry.</span
                       >
                     </div>
                   {/if}
@@ -671,26 +727,71 @@
                           {#each entry.bullets as bullet, bulletIdx (bulletIdx)}
                             <li class="bullet-item" style="margin-bottom: var(--spacing-bullet);">
                               <div class="bullet-controls">
-                                <button
-                                  type="button"
-                                  class="bullet-tool-btn"
-                                  disabled={bulletIdx === 0}
-                                  onclick={() => moveBulletUp(secIdx, entryIdx, bulletIdx)}
-                                  >▲</button
-                                >
-                                <button
-                                  type="button"
-                                  class="bullet-tool-btn"
-                                  disabled={bulletIdx === entry.bullets.length - 1}
-                                  onclick={() => moveBulletDown(secIdx, entryIdx, bulletIdx)}
-                                  >▼</button
-                                >
-                                <button
-                                  type="button"
-                                  class="bullet-tool-btn delete"
-                                  onclick={() => removeBullet(secIdx, entryIdx, bulletIdx)}
-                                  >✕</button
-                                >
+                                <div class="bullet-toolbar">
+                                  <button
+                                    type="button"
+                                    class="bullet-tool-btn"
+                                    disabled={bulletIdx === 0}
+                                    onclick={() => moveBulletUp(secIdx, entryIdx, bulletIdx)}
+                                    title="Move Up"
+                                  >
+                                    <svg
+                                      width="10"
+                                      height="10"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="2.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      ><polyline points="18 15 12 9 6 15" /></svg
+                                    >
+                                  </button>
+                                  <span class="bullet-toolbar-sep"></span>
+                                  <button
+                                    type="button"
+                                    class="bullet-tool-btn"
+                                    disabled={bulletIdx === entry.bullets.length - 1}
+                                    onclick={() => moveBulletDown(secIdx, entryIdx, bulletIdx)}
+                                    title="Move Down"
+                                  >
+                                    <svg
+                                      width="10"
+                                      height="10"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="2.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      ><polyline points="6 9 12 15 18 9" /></svg
+                                    >
+                                  </button>
+                                  <span class="bullet-toolbar-sep"></span>
+                                  <button
+                                    type="button"
+                                    class="bullet-tool-btn delete"
+                                    onclick={() => removeBullet(secIdx, entryIdx, bulletIdx)}
+                                    title="Delete Bullet"
+                                  >
+                                    <svg
+                                      width="10"
+                                      height="10"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="2.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      ><line x1="18" y1="6" x2="6" y2="18" /><line
+                                        x1="6"
+                                        y1="6"
+                                        x2="18"
+                                        y2="18"
+                                      /></svg
+                                    >
+                                  </button>
+                                </div>
                               </div>
                               <textarea
                                 bind:value={entry.bullets[bulletIdx]}
@@ -735,26 +836,71 @@
                           {#each entry.bullets as bullet, bulletIdx (bulletIdx)}
                             <li class="bullet-item" style="margin-bottom: var(--spacing-bullet);">
                               <div class="bullet-controls">
-                                <button
-                                  type="button"
-                                  class="bullet-tool-btn"
-                                  disabled={bulletIdx === 0}
-                                  onclick={() => moveBulletUp(secIdx, entryIdx, bulletIdx)}
-                                  >▲</button
-                                >
-                                <button
-                                  type="button"
-                                  class="bullet-tool-btn"
-                                  disabled={bulletIdx === entry.bullets.length - 1}
-                                  onclick={() => moveBulletDown(secIdx, entryIdx, bulletIdx)}
-                                  >▼</button
-                                >
-                                <button
-                                  type="button"
-                                  class="bullet-tool-btn delete"
-                                  onclick={() => removeBullet(secIdx, entryIdx, bulletIdx)}
-                                  >✕</button
-                                >
+                                <div class="bullet-toolbar">
+                                  <button
+                                    type="button"
+                                    class="bullet-tool-btn"
+                                    disabled={bulletIdx === 0}
+                                    onclick={() => moveBulletUp(secIdx, entryIdx, bulletIdx)}
+                                    title="Move Up"
+                                  >
+                                    <svg
+                                      width="10"
+                                      height="10"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="2.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      ><polyline points="18 15 12 9 6 15" /></svg
+                                    >
+                                  </button>
+                                  <span class="bullet-toolbar-sep"></span>
+                                  <button
+                                    type="button"
+                                    class="bullet-tool-btn"
+                                    disabled={bulletIdx === entry.bullets.length - 1}
+                                    onclick={() => moveBulletDown(secIdx, entryIdx, bulletIdx)}
+                                    title="Move Down"
+                                  >
+                                    <svg
+                                      width="10"
+                                      height="10"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="2.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      ><polyline points="6 9 12 15 18 9" /></svg
+                                    >
+                                  </button>
+                                  <span class="bullet-toolbar-sep"></span>
+                                  <button
+                                    type="button"
+                                    class="bullet-tool-btn delete"
+                                    onclick={() => removeBullet(secIdx, entryIdx, bulletIdx)}
+                                    title="Delete Bullet"
+                                  >
+                                    <svg
+                                      width="10"
+                                      height="10"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-width="2.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      ><line x1="18" y1="6" x2="6" y2="18" /><line
+                                        x1="6"
+                                        y1="6"
+                                        x2="18"
+                                        y2="18"
+                                      /></svg
+                                    >
+                                  </button>
+                                </div>
                               </div>
                               <textarea
                                 bind:value={entry.bullets[bulletIdx]}
@@ -1604,8 +1750,12 @@
   }
 
   .section-flat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
     border-bottom: 1.5px solid var(--color-text);
-    padding-bottom: 2px;
+    padding-bottom: 3px;
     margin-bottom: 0.75rem;
     color: var(--color-text);
   }
@@ -1615,8 +1765,84 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     color: inherit;
+  }
+
+  /* Section inline toolbar — shown on hover of the section header */
+  .section-inline-toolbar {
+    display: flex;
+    align-items: stretch;
+    background: #ffffff;
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    height: 26px;
+    flex-shrink: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  .section-flat-header:hover .section-inline-toolbar,
+  .section-flat-header:focus-within .section-inline-toolbar,
+  .section-inline-toolbar:hover {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .section-tool-sep {
+    width: 1px;
+    align-self: stretch;
+    background: var(--color-border);
+    flex-shrink: 0;
+    margin: 4px 0;
+  }
+
+  .section-tool-btn {
+    border: none;
+    background: transparent;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition:
+      background 0.12s,
+      color 0.12s;
+    flex-shrink: 0;
+    padding: 0;
+    line-height: 0;
+  }
+
+  .section-tool-btn svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .section-tool-btn:hover:not(:disabled) {
+    background: var(--color-accent-light);
+    color: var(--color-accent-dark);
+  }
+
+  .section-tool-btn:disabled {
+    opacity: 0.28;
+    cursor: default;
+  }
+
+  .section-tool-btn.delete:hover:not(:disabled) {
+    background: #fee2e2;
+    color: #ef4444;
+  }
+
+  .section-tool-btn.add:hover:not(:disabled) {
+    background: #ecfdf5;
+    color: #059669;
   }
 
   .entries-flat-list {
@@ -1745,13 +1971,14 @@
   /* Bullet toolbar controls */
   .bullet-controls {
     position: absolute;
-    left: -54px;
-    top: 4px;
+    left: -80px;
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
-    gap: 1px;
+    align-items: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.12s ease 0s;
+    transition: opacity 0.15s ease 0s;
     z-index: 10;
   }
 
@@ -1759,10 +1986,10 @@
   .bullet-controls::after {
     content: "";
     position: absolute;
-    top: 0;
+    top: -8px;
     left: 100%;
-    width: 60px;
-    height: 100%;
+    width: 84px;
+    bottom: -8px;
   }
 
   .bullet-item:hover .bullet-controls,
@@ -1771,25 +1998,61 @@
     pointer-events: auto;
   }
 
-  .bullet-tool-btn {
-    border: 1px solid var(--color-border);
+  /* The pill-shaped unified toolbar */
+  .bullet-toolbar {
+    display: flex;
+    align-items: stretch;
     background: #ffffff;
-    border-radius: 4px;
-    width: 16px;
-    height: 16px;
-    font-size: 0.55rem;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    color: var(--color-text-muted);
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    height: 26px;
   }
 
-  .bullet-tool-btn:hover {
+  .bullet-toolbar-sep {
+    width: 1px;
+    align-self: stretch;
+    background: var(--color-border);
+    flex-shrink: 0;
+    margin: 4px 0;
+  }
+
+  .bullet-tool-btn {
+    border: none;
+    background: transparent;
+    width: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition:
+      background 0.12s,
+      color 0.12s;
+    flex-shrink: 0;
+    padding: 0;
+    line-height: 0;
+  }
+
+  .bullet-tool-btn svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .bullet-tool-btn:hover:not(:disabled) {
     background: var(--color-accent-light);
     color: var(--color-accent-dark);
   }
 
-  .bullet-tool-btn.delete:hover {
+  .bullet-tool-btn:disabled {
+    opacity: 0.28;
+    cursor: default;
+  }
+
+  .bullet-tool-btn.delete:hover:not(:disabled) {
     background: #fee2e2;
     color: #ef4444;
   }
@@ -1870,7 +2133,7 @@
     overflow: hidden;
   }
 
-  /* Floating Toolbars */
+  /* Floating Toolbars — only used for entry toolbars now */
   .floating-toolbar {
     position: absolute;
     display: flex;
@@ -1886,31 +2149,6 @@
       opacity 0.12s ease 0s,
       transform 0.12s ease 0s;
     z-index: 50;
-  }
-
-  /* Section block toolbars */
-  .section-toolbar {
-    left: -52px;
-    top: 4px;
-    flex-direction: column;
-    transform: translateX(0);
-  }
-
-  /* Invisible bridge: extends hover zone rightward to reach the section-block */
-  .section-toolbar::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 100%;
-    width: 58px;
-    height: 100%;
-    min-height: 40px;
-  }
-
-  .section-block:hover .section-toolbar,
-  .section-toolbar:hover {
-    opacity: 1;
-    pointer-events: auto;
   }
 
   /* Entry block toolbars */
@@ -2077,11 +2315,6 @@
 
   /* Responsive tweaks */
   @media (max-width: 1000px) {
-    .section-toolbar {
-      left: 0;
-      top: -28px;
-      flex-direction: row;
-    }
     .entry-toolbar {
       right: 0;
       top: -28px;
@@ -2112,6 +2345,8 @@
     .form-header,
     .form-tabs,
     .floating-toolbar,
+    .bullet-controls,
+    .section-inline-toolbar,
     .tag-delete-btn,
     .flat-add-link,
     .add-section-footer {
