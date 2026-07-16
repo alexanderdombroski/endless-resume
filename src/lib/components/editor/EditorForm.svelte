@@ -255,14 +255,19 @@
     }
   });
 
-  // Watch activeSectionIndex changes from sidebar to perform smooth scroll
+  // Watch activeSectionIndex changes from sidebar to perform smooth scroll.
+  // We use a manual scroll offset instead of scrollIntoView so the section
+  // lands just below the sticky header (64px) with a small breathing gap.
   $effect(() => {
     if (activeSectionIndex !== null && activeSectionIndex !== undefined) {
       const elId =
         activeSectionIndex === 0 ? "flat-section-basics" : `flat-section-${activeSectionIndex - 1}`;
       const el = document.getElementById(elId);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        const HEADER_HEIGHT = 64;
+        const GAP = 16;
+        const top = el.getBoundingClientRect().top + window.scrollY - HEADER_HEIGHT - GAP;
+        window.scrollTo({ top, behavior: "smooth" });
       }
     }
   });

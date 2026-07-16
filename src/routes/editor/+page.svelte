@@ -103,35 +103,37 @@
       <EditorSkeleton />
     {:else}
       <!-- Sidebar panel -->
-      <aside class="editor-sidebar" aria-label="Resume sections">
-        <div class="sidebar-header">
-          <p class="sidebar-label">Sections</p>
-        </div>
-        <nav class="sidebar-nav" aria-label="Resume section navigation">
-          <!-- Basics section toggle -->
-          <button
-            class="sidebar-item"
-            class:active={activeSectionIndex === 0 ||
-              activeSectionIndex === -1 ||
-              activeSectionIndex === null}
-            onclick={() => (activeSectionIndex = 0)}
-          >
-            <span class="sidebar-item-dot" aria-hidden="true"></span>
-            Basics & Contact
-          </button>
-
-          <!-- Dynamic sections toggle -->
-          {#each resume.sections as section, index (index)}
+      <div class="sidebar-column">
+        <aside class="editor-sidebar" aria-label="Resume sections">
+          <div class="sidebar-header">
+            <p class="sidebar-label">Sections</p>
+          </div>
+          <nav class="sidebar-nav" aria-label="Resume section navigation">
+            <!-- Basics section toggle -->
             <button
               class="sidebar-item"
-              class:active={activeSectionIndex === index + 1}
-              onclick={() => (activeSectionIndex = index + 1)}
+              class:active={activeSectionIndex === 0 ||
+                activeSectionIndex === -1 ||
+                activeSectionIndex === null}
+              onclick={() => (activeSectionIndex = 0)}
             >
               <span class="sidebar-item-dot" aria-hidden="true"></span>
-              {section.title || `Section ${index + 1}`}
+              Basics & Contact
             </button>
-          {/each}
-        </nav>
+
+            <!-- Dynamic sections toggle -->
+            {#each resume.sections as section, index (index)}
+              <button
+                class="sidebar-item"
+                class:active={activeSectionIndex === index + 1}
+                onclick={() => (activeSectionIndex = index + 1)}
+              >
+                <span class="sidebar-item-dot" aria-hidden="true"></span>
+                {section.title || `Section ${index + 1}`}
+              </button>
+            {/each}
+          </nav>
+        </aside>
 
         <div class="sidebar-footer">
           <div class="sidebar-helper-card">
@@ -141,7 +143,7 @@
             </p>
           </div>
         </div>
-      </aside>
+      </div>
 
       <!-- Main editor canvas (renders the EditorForm component directly) -->
       <section class="editor-canvas" aria-labelledby="editor-title">
@@ -203,14 +205,25 @@
     font-size: 0.85rem;
   }
 
-  /* === Sidebar === */
-  .editor-sidebar {
+  /* === Sidebar column wrapper (takes the grid slot, owns the bg + border) === */
+  .sidebar-column {
     background: var(--color-surface);
     border-right: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
+  }
+
+  /* === Sidebar nav (sticky within the column) === */
+  .editor-sidebar {
+    display: flex;
+    flex-direction: column;
     padding: 1.25rem 0;
     gap: 0.5rem;
+    /* Sticky: pins below the 64px header, scrolls within viewport height */
+    position: sticky;
+    top: 64px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
   }
 
   .sidebar-header {
@@ -280,6 +293,7 @@
 
   .sidebar-footer {
     margin-top: auto;
+    margin-bottom: 1rem;
     padding: 1rem 1.25rem 0;
   }
 
@@ -328,6 +342,12 @@
     border-left: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
+    /* Sticky: pins below the 64px header, scrolls within viewport height */
+    position: sticky;
+    top: 64px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    align-self: start;
   }
 
   .panel-header {
@@ -399,9 +419,14 @@
     .editor-shell {
       grid-template-columns: 1fr;
     }
-    .editor-sidebar {
+    .sidebar-column {
       border-right: none;
       border-bottom: 1px solid var(--color-border);
+    }
+    .editor-sidebar {
+      position: static;
+      max-height: none;
+      overflow-y: visible;
       padding: 1rem;
     }
     .sidebar-nav {
