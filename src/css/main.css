@@ -22,14 +22,22 @@
 
 /* Printing*/
 @media print {
+  @page {
+    margin: 0.5in;
+    size: auto;
+
+    @top-center {
+      content: "";
+    }
+    @bottom-center {
+      content: "";
+    }
+  }
+
   .site-header,
   .site-footer {
     display: none !important;
   }
-}
-
-@page {
-  margin: 0.75in;
 }
 
 /*Global buttons*/
