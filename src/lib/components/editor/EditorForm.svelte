@@ -8,12 +8,14 @@
     resume = $bindable(),
     activeSectionIndex = $bindable(0),
     isEditing = $bindable(false),
-    onSave
+    onSave,
+    autoSaveStatus = "idle"
   }: {
     resume: Resume;
     activeSectionIndex?: number | null;
     isEditing?: boolean;
     onSave?: () => Promise<void>;
+    autoSaveStatus?: "idle" | "pending" | "saving" | "saved";
   } = $props();
 
   // Component UI State
@@ -324,6 +326,50 @@
       />
     </div>
     <div class="actions">
+      <!-- Autosave status chip -->
+      {#if autoSaveStatus !== "idle"}
+        <span
+          class="autosave-chip"
+          class:autosave-pending={autoSaveStatus === "pending"}
+          class:autosave-saving={autoSaveStatus === "saving"}
+          class:autosave-saved={autoSaveStatus === "saved"}
+          aria-live="polite"
+        >
+          {#if autoSaveStatus === "pending"}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Unsaved changes
+          {:else if autoSaveStatus === "saving"}
+            <span class="autosave-spinner"></span>
+            Autosaving…
+          {:else if autoSaveStatus === "saved"}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Autosaved
+          {/if}
+        </span>
+      {/if}
       <button type="button" class="btn btn-secondary print-btn" onclick={handlePrint}>
         <svg
           width="16"
@@ -364,7 +410,7 @@
             <polyline points="17 21 17 13 7 13 7 21" />
             <polyline points="7 3 7 8 15 8" />
           </svg>
-          Save Changes
+          Save
         {:else if saveStatus === "saving"}
           <span class="spinner"></span>
           Saving...
@@ -1214,6 +1260,55 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  /* --- Autosave chip --- */
+  .autosave-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .autosave-chip.autosave-pending {
+    color: #92400e;
+    background: #fef3c7;
+    border-color: #fde68a;
+  }
+
+  .autosave-chip.autosave-saving {
+    color: #1e40af;
+    background: #dbeafe;
+    border-color: #bfdbfe;
+  }
+
+  .autosave-chip.autosave-saved {
+    color: #065f46;
+    background: #d1fae5;
+    border-color: #a7f3d0;
+  }
+
+  .autosave-spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid #bfdbfe;
+    border-top-color: #1e40af;
+    border-radius: 50%;
+    animation: autosave-spin 0.7s linear infinite;
+  }
+
+  @keyframes autosave-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .print-btn {
