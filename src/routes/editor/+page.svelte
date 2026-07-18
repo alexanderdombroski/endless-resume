@@ -449,7 +449,7 @@
       border-top: none;
     }
 
-    .editor-sidebar,
+    .sidebar-column,
     .editor-panel,
     .editor-error {
       display: none;
