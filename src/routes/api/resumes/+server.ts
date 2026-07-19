@@ -3,6 +3,7 @@ import { auth } from "$lib/auth/auth";
 import { getDb } from "$lib/db/mongo";
 import { CreateResumeSchema } from "$lib/schemas";
 import { createResume, type ResumeDocument } from "$lib/db/models/resume.model";
+import { sanitizeResumeSections } from "$lib/rich-text";
 
 function apiError(message: string, status = 500, errors?: unknown) {
   return json({ message, status, errors }, { status });
@@ -102,7 +103,12 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   try {
-    const resume = await createResume(parsed.data, session.user.id);
+    const sanitizedData = {
+      ...parsed.data,
+      sections: sanitizeResumeSections(parsed.data.sections)
+    };
+
+    const resume = await createResume(sanitizedData, session.user.id);
 
     return json(
       {
