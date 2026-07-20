@@ -23,9 +23,6 @@
   $effect(() => {
     if (el && value !== lastEmitted && value !== el.innerHTML) {
       const clean = sanitizeRichText(value);
-      // contenteditable's content isn't Svelte-managed markup — there's no
-      // declarative way to render it, so syncing it from external state
-      // requires writing innerHTML directly.
       // eslint-disable-next-line svelte/no-dom-manipulating
       el.innerHTML = clean;
       lastEmitted = clean;
@@ -42,7 +39,7 @@
     if (!el) return;
     const clean = sanitizeRichText(el.innerHTML);
     if (clean !== el.innerHTML) {
-      // eslint-disable-next-line svelte/no-dom-manipulating -- see effect above
+      // eslint-disable-next-line svelte/no-dom-manipulating
       el.innerHTML = clean;
     }
     lastEmitted = clean;
