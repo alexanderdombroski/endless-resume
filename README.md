@@ -14,6 +14,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Team Members
 
+- [Alex Dombroski](https://github.com/alexanderdombroski)
 - [Logan MacConnell](https://github.com/LMacconnell2)
 - [TJ Strickland](https://github.com/TeaJay13)
 

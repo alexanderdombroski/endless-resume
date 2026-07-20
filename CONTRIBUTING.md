@@ -30,6 +30,8 @@ The app requires the following variables in `.src`
 
 ```zsh
 DATABASE_URL="mongodb+srv://**********************************"
+BETTER_AUTH_URL="http://localhost:5173"
+BETTER_AUTH_SECRET="<random_hash>"
 ```
 
 ## Full Technology List
@@ -60,6 +62,3 @@ DATABASE_URL="mongodb+srv://**********************************"
 ### Other Libraries
 
 - [Zod](https://zod.dev/)
-- [pre-text](https://chenglou.me/pretext/)
-- TODO: Library to create PDF. [pdf-js](https://mozilla.github.io/pdf.js/) to display pdfs?
-- TODO: Library for offline editing maybe? dexie?
