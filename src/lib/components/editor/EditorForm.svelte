@@ -2,6 +2,8 @@
   import { tick } from "svelte";
   import type { Resume, Section, SubSection, SectionType } from "$lib/schemas";
   import { defaultFont, defaultSpacing } from "$lib/assets/data/templates";
+  import { isRichTextEmpty } from "$lib/rich-text";
+  import RichTextField from "./RichTextField.svelte";
 
   // Bindable props using Svelte 5 runes
   let {
@@ -231,31 +233,6 @@
     }
     resume.sections = [...resume.sections];
   }
-
-  // Auto-resize textarea on input to behave like normal document text
-  function handleTextareaInput(e: Event) {
-    const el = e.currentTarget as HTMLTextAreaElement;
-    el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
-  }
-
-  // Trigger initial resize for textareas on mount or tab change
-  function resizeAllTextareas() {
-    setTimeout(() => {
-      const textareas = document.querySelectorAll(".flat-textarea");
-      textareas.forEach((ta) => {
-        const el = ta as HTMLTextAreaElement;
-        el.style.height = "auto";
-        el.style.height = el.scrollHeight + "px";
-      });
-    }, 50);
-  }
-
-  $effect(() => {
-    if (activeTab === "content") {
-      resizeAllTextareas();
-    }
-  });
 
   // Watch activeSectionIndex changes from sidebar to perform smooth scroll.
   // We use a manual scroll offset instead of scrollIntoView so the section
@@ -734,11 +711,11 @@
                         <!-- TIMELINE LAYOUT (Job, Education) -->
                         <div class="timeline-entry-grid">
                           <div class="row-main">
-                            <input
-                              type="text"
+                            <RichTextField
                               bind:value={entry.heading}
                               class="flat-input bold entry-heading"
                               placeholder="Job Title or Degree"
+                              ariaLabel="Job Title or Degree"
                             />
                             <div class="date-range">
                               <input
@@ -757,11 +734,11 @@
                             </div>
                           </div>
                           <div class="row-sub">
-                            <input
-                              type="text"
+                            <RichTextField
                               bind:value={entry.subheading}
                               class="flat-input italic entry-subheading"
                               placeholder="Company or Institution Name"
+                              ariaLabel="Company or Institution Name"
                             />
                             <input
                               type="text"
@@ -844,12 +821,13 @@
                                   </button>
                                 </div>
                               </div>
-                              <textarea
+                              <RichTextField
                                 bind:value={entry.bullets[bulletIdx]}
-                                oninput={handleTextareaInput}
+                                multiline
                                 class="flat-textarea bullet-textarea"
-                                rows="1"
-                                placeholder="Describe contribution or responsibility..."></textarea>
+                                placeholder="Describe contribution or responsibility..."
+                                ariaLabel="Bullet point"
+                              />
                             </li>
                           {/each}
                         </ul>
@@ -857,11 +835,11 @@
                         <!-- STRUCTURED LAYOUT (Projects, Certifications) -->
                         <div class="structured-entry-grid">
                           <div class="row-main">
-                            <input
-                              type="text"
+                            <RichTextField
                               bind:value={entry.heading}
                               class="flat-input bold entry-heading"
                               placeholder="Project Name or Certificate"
+                              ariaLabel="Project Name or Certificate"
                             />
                             <div class="date-range">
                               <input
@@ -953,13 +931,13 @@
                                   </button>
                                 </div>
                               </div>
-                              <textarea
+                              <RichTextField
                                 bind:value={entry.bullets[bulletIdx]}
-                                oninput={handleTextareaInput}
+                                multiline
                                 class="flat-textarea bullet-textarea"
-                                rows="1"
                                 placeholder="Highlight a project key result or tech stack details..."
-                              ></textarea>
+                                ariaLabel="Bullet point"
+                              />
                             </li>
                           {/each}
                         </ul>
@@ -967,22 +945,22 @@
                         <!-- LIST LAYOUT (Skills, Languages) -->
                         <div class="list-entry-flat">
                           {#if entry.heading !== undefined}
-                            <input
-                              type="text"
+                            <RichTextField
                               bind:value={entry.heading}
                               class="flat-input bold list-heading"
                               placeholder="Skills Group Name"
+                              ariaLabel="Skills Group Name"
                             />
                           {/if}
                           <div class="skills-flat-grid">
                             <!-- eslint-disable-next-line -- @typescript-eslint/no-unused-vars -->
                             {#each entry.items as item, itemIdx (itemIdx)}
                               <div class="skill-flat-tag">
-                                <input
-                                  type="text"
+                                <RichTextField
                                   bind:value={entry.items[itemIdx]}
                                   class="flat-input skill-tag-input"
                                   placeholder="Skill"
+                                  ariaLabel="Skill"
                                 />
                                 <button
                                   type="button"
@@ -997,21 +975,21 @@
                       {:else if entry.type === "text"}
                         <!-- TEXT LAYOUT (Professional Summary) -->
                         <div class="text-entry-flat">
-                          {#if entry.heading}
-                            <input
-                              type="text"
+                          {#if !isRichTextEmpty(entry.heading ?? "")}
+                            <RichTextField
                               bind:value={entry.heading}
                               class="flat-input bold text-heading"
                               placeholder="Heading"
+                              ariaLabel="Heading"
                             />
                           {/if}
-                          <textarea
+                          <RichTextField
                             bind:value={entry.content}
-                            oninput={handleTextareaInput}
+                            multiline
                             class="flat-textarea content-textarea"
-                            rows="3"
                             placeholder="Write summary paragraph or general text content here..."
-                          ></textarea>
+                            ariaLabel="Summary content"
+                          />
                         </div>
                       {/if}
                     </div>
@@ -1631,7 +1609,7 @@
 
   /* Flat Inline Inputs */
   .flat-input,
-  .flat-textarea {
+  :global(.flat-textarea) {
     border: 1px dashed transparent;
     background: transparent;
     font-family: inherit;
@@ -1647,13 +1625,15 @@
   }
 
   .flat-input:hover,
-  .flat-textarea:hover {
+  :global(.flat-textarea:hover) {
     border-color: #cbd5e1;
     background: rgba(241, 245, 249, 0.6);
   }
 
   .flat-input:focus,
-  .flat-textarea:focus {
+  .flat-input:focus-within,
+  :global(.flat-textarea:focus),
+  :global(.flat-textarea:focus-within) {
     outline: none;
     border-color: var(--color-accent);
     background: #ffffff;
@@ -1987,7 +1967,7 @@
     gap: 1rem;
   }
 
-  .entry-heading {
+  :global(.entry-heading) {
     flex: 1;
     font-size: 0.9rem;
     font-weight: 700;
@@ -2021,7 +2001,7 @@
     font-size: 0.85rem;
   }
 
-  .entry-subheading {
+  :global(.entry-subheading) {
     flex: 1;
     font-style: italic;
     color: var(--color-text-muted);
@@ -2058,14 +2038,13 @@
     line-height: 1;
   }
 
-  .bullet-textarea {
+  :global(.bullet-textarea) {
     width: 100%;
     resize: none;
     font-family: inherit;
     font-size: var(--font-size-bullet);
     line-height: 1.6;
     padding: 2px 4px;
-    overflow: hidden;
   }
 
   /* Bullet toolbar controls */
@@ -2165,7 +2144,7 @@
     padding: 0.25rem 0;
   }
 
-  .list-heading {
+  :global(.list-heading) {
     font-size: 0.88rem;
     font-weight: 700;
     color: var(--color-text);
@@ -2195,7 +2174,7 @@
     pointer-events: auto;
   }
 
-  .skill-tag-input {
+  :global(.skill-tag-input) {
     border: none !important;
     background: transparent !important;
     padding: 0 !important;
@@ -2206,7 +2185,7 @@
     text-align: left;
   }
 
-  .skill-tag-input:focus {
+  :global(.skill-tag-input:focus) {
     box-shadow: none !important;
   }
 
@@ -2218,19 +2197,18 @@
     padding: 0.25rem 0;
   }
 
-  .text-heading {
+  :global(.text-heading) {
     font-size: 0.88rem;
     font-weight: 700;
     color: var(--color-text);
   }
 
-  .content-textarea {
+  :global(.content-textarea) {
     width: 100%;
     resize: none;
     font-family: inherit;
     font-size: var(--font-size-bullet);
     line-height: 1.6;
-    overflow: hidden;
   }
 
   /* Floating Toolbars — only used for entry toolbars now */
@@ -2471,7 +2449,7 @@
     }
 
     .flat-input,
-    .flat-textarea {
+    :global(.flat-textarea) {
       border-color: transparent !important;
       background: transparent !important;
     }

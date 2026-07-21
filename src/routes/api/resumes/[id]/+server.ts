@@ -6,6 +6,7 @@ import { auth } from "$lib/auth/auth";
 import { getDb } from "$lib/db/mongo";
 import { SectionSchema } from "$lib/schemas";
 import type { ResumeDocument } from "$lib/db/models/resume.model";
+import { sanitizeResumeSections } from "$lib/rich-text";
 
 type NewResumeDocument = OptionalId<ResumeDocument>;
 
@@ -193,6 +194,7 @@ export async function PUT(event: RequestEvent) {
     {
       $set: {
         ...parsed.data,
+        sections: sanitizeResumeSections(parsed.data.sections),
         updatedAt
       }
     },
