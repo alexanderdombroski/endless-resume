@@ -1,6 +1,6 @@
 # Endless Resume Spec
 
-For a full list of technologies and environment setup, see the [Contributing Guide](../../CONTRIBUTING.md).
+For a full list of technologies and environment setup, see the [Contributing Guide](../CONTRIBUTING.md).
 
 ## Architecture Decision Records
 

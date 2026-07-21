@@ -21,6 +21,14 @@
   // Track if any field in EditorForm is focused / actively edited
   let isEditing = $state(false);
 
+  // --- Autosave ---
+  // Status exposed to EditorForm for the indicator chip.
+  let autoSaveStatus = $state<"idle" | "pending" | "saving" | "saved">("idle");
+  // Snapshot of the last successfully saved resume, used to detect unsaved changes.
+  let lastSavedSnapshot = $state<string | null>(null);
+  // Timer handle for the 60-second throttle.
+  let autoSaveTimer: ReturnType<typeof setTimeout> | undefined;
+
   async function saveResume() {
     if (!resume) {
       throw new Error("No resume loaded");
@@ -47,7 +55,60 @@
 
     const { updatedAt } = (await res.json()) as { updatedAt: string };
     resume.updatedAt = updatedAt;
+    // Update the snapshot so we don't re-trigger autosave for the saved content.
+    lastSavedSnapshot = buildSnapshot(resume);
   }
+
+  /** Returns a serialised string of the fields sent to the API for dirty-checking. */
+  function buildSnapshot(r: Resume): string {
+    return JSON.stringify({
+      title: r.title,
+      subtitle: r.subtitle,
+      sections: r.sections,
+      spacing: r.spacing,
+      font: r.font
+    });
+  }
+
+  /** Schedule (or reschedule) the 60-second autosave timer. */
+  function scheduleAutosave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveStatus = "pending";
+    autoSaveTimer = setTimeout(async () => {
+      autoSaveStatus = "saving";
+      try {
+        await saveResume();
+        autoSaveStatus = "saved";
+        setTimeout(() => {
+          autoSaveStatus = "idle";
+        }, 3000);
+      } catch {
+        // Manual save button will surface the error; reset to pending so user
+        // is aware there are unsaved changes.
+        autoSaveStatus = "pending";
+      }
+    }, 30_000);
+  }
+
+  // Watch resume for changes and trigger autosave throttle.
+  $effect(() => {
+    // Only run once a resume has been loaded.
+    if (!resume || isLoading) return;
+
+    const snapshot = buildSnapshot(resume);
+
+    // Initialise the baseline snapshot on first load so we don't immediately
+    // schedule a save for a fresh document.
+    if (lastSavedSnapshot === null) {
+      lastSavedSnapshot = snapshot;
+      return;
+    }
+
+    // Only schedule when the content has actually changed.
+    if (snapshot !== lastSavedSnapshot) {
+      scheduleAutosave();
+    }
+  });
 
   async function loadResume(resumeId: string) {
     isLoading = true;
@@ -147,7 +208,13 @@
 
       <!-- Main editor canvas (renders the EditorForm component directly) -->
       <section class="editor-canvas" aria-labelledby="editor-title">
-        <EditorForm bind:resume bind:activeSectionIndex bind:isEditing onSave={saveResume} />
+        <EditorForm
+          bind:resume
+          bind:activeSectionIndex
+          bind:isEditing
+          onSave={saveResume}
+          {autoSaveStatus}
+        />
       </section>
 
       <!-- Right panel: job description / AI suggestions -->
@@ -449,7 +516,7 @@
       border-top: none;
     }
 
-    .editor-sidebar,
+    .sidebar-column,
     .editor-panel,
     .editor-error {
       display: none;
