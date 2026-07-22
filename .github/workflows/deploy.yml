@@ -12,6 +12,14 @@ jobs:
   # Single deploy job since we're just deploying
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+      DATABASE_CLUSTER: ${{ secrets.DATABASE_CLUSTER }}
+      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+      BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -19,18 +27,12 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-      - name: Install
+      - name: Install dependencies
         run: npm ci
       - name: Build
         run: npm run build
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          DATABASE_CLUSTER: ${{ secrets.DATABASE_CLUSTER }}
-          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Test
         run: npm run test
       - name: Deploy
