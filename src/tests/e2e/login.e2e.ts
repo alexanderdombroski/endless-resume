@@ -10,11 +10,11 @@ async function loginViaDialog(
   email = TEST_EMAIL,
   password = TEST_PASSWORD
 ) {
-  await page.getByRole("button", { name: "Sign in / Register" }).click();
+  await page.getByLabel("Primary").getByRole("button", { name: "Sign in / Register" }).click();
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password").fill(password);
-  // Use the submit button inside the form, not the header nav button
-  await page.locator("form .ld-submit").click();
+  // Use the submit button inside the open dialog
+  await page.locator("dialog[open] form .ld-submit").click();
 }
 
 test.describe("Login flow", () => {
@@ -23,7 +23,7 @@ test.describe("Login flow", () => {
   });
 
   test("opens the login dialog when clicking Sign in / Register", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign in / Register" }).click();
+    await page.getByLabel("Primary").getByRole("button", { name: "Sign in / Register" }).click();
 
     await expect(page.getByRole("tab", { name: "Sign in" })).toBeVisible();
     await expect(page.getByRole("tab", { name: "Create account" })).toBeVisible();
@@ -52,7 +52,7 @@ test.describe("Login flow", () => {
   });
 
   test("can switch to Create account tab and back", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign in / Register" }).click();
+    await page.getByLabel("Primary").getByRole("button", { name: "Sign in / Register" }).click();
 
     // Switch to register — name field appears
     await page.getByRole("tab", { name: "Create account" }).click();
@@ -64,7 +64,7 @@ test.describe("Login flow", () => {
   });
 
   test("closes the dialog when clicking the backdrop", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign in / Register" }).click();
+    await page.getByLabel("Primary").getByRole("button", { name: "Sign in / Register" }).click();
     await expect(page.getByLabel("Email")).toBeVisible();
 
     // The native <dialog> covers the full viewport; click a corner far from the

@@ -31,6 +31,8 @@ jobs:
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      - name: Test
+        run: npm run test
       - name: Deploy
         run: |
           npm i -g netlify-cli
