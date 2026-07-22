@@ -6,6 +6,7 @@
 
 <svelte:head>
   <link rel="icon" href="/favicon.svg" />
+  <title>Endless Resume</title>
 </svelte:head>
 
 {@render children()}
