@@ -1,18 +1,14 @@
 # Contributing
 
+For information about what to contribute, see the [Trello](https://trello.com/b/OhRBFcVH/endlessresume) and [Feature & Technology Spec](./docs/spec.md).
+
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install`, start a development server:
 
 ```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
-
-[Trello](https://trello.com/b/OhRBFcVH/endlessresume)
-[Feature & Technology Spec](./docs/spec.md)
 
 ## Building
 
